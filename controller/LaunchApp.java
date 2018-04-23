@@ -253,7 +253,35 @@ public class LaunchApp {
             		System.out.println("Invalid username or password. Please try again!");        			
         		}
         }else if (selection == 2) {
-    		
+        	//sign up for the user
+        	System.out.println("Please Enter Your Name: ");
+        	String name = in.nextLine().trim();
+        	
+        	System.out.println("Please Enter Your Email: ");
+        	String email = in.nextLine().trim();
+        	
+        	System.out.println("Please Enter Your CreditCard: ");
+        	String cc = in.nextLine().trim();
+     
+        	System.out.println("Please Enter Your Address: ");
+        	String add = in.nextLine().trim();
+        	
+        	System.out.println("Please Enter Your Password: ");
+        	String pass = in.nextLine().trim();
+        	
+        	preparedStatement.execute("insert into users(Name, Email, CreditCard, Address, Password, admin) values (?, ?, ?, ?, ?, 0)");
+      	  
+        	preparedStatement.setString(1, name);
+        	preparedStatement.setString(2, email);
+        	preparedStatement.setString(3, cc);
+        	preparedStatement.setString(4, add);
+        	preparedStatement.setString(5, pass);
+        	preparedStatement.setInt(6, 0);
+
+
+//        	System.out.println(name + email + cc + add + pass);
+        	
+
         	System.out.println("Please try signing in using your credentials!");
     	}
     		else
