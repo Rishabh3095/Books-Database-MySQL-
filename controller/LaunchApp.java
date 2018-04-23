@@ -22,6 +22,8 @@ public class LaunchApp {
 	  
   }
   
+  
+  
   public static void viewOrders()
   {
 	  
@@ -87,7 +89,25 @@ public class LaunchApp {
   }
 
   
-
+  public static void signUp(String name, String email, String cc, String add, String pass)
+  {
+	  try {
+		preparedStatement = connection.prepareStatement("insert into users(Name, Email, CreditCard, Address, Password, admin) values (?, ?, ?, ?, ?, 0)");
+		preparedStatement.setString(1, name);
+	  	preparedStatement.setString(2, email);
+	  	preparedStatement.setString(3, cc);
+	  	preparedStatement.setString(4, add);
+	  	preparedStatement.setString(5, pass);
+	  	preparedStatement.executeUpdate();
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+		
+  
+  }
+  
+  
   public static void addItem() throws SQLException {
 	  
 	  statement.execute("insert into Orders(oID, items, uID) values (1000, \"check\", 5);");
@@ -269,16 +289,8 @@ public class LaunchApp {
         	System.out.println("Please Enter Your Password: ");
         	String pass = in.nextLine().trim();
         	
-        	preparedStatement.execute("insert into users(Name, Email, CreditCard, Address, Password, admin) values (?, ?, ?, ?, ?, 0)");
-      	  
-        	preparedStatement.setString(1, name);
-        	preparedStatement.setString(2, email);
-        	preparedStatement.setString(3, cc);
-        	preparedStatement.setString(4, add);
-        	preparedStatement.setString(5, pass);
-        	preparedStatement.setInt(6, 0);
-
-
+			signUp(name, email, cc, add, pass);
+        	
 //        	System.out.println(name + email + cc + add + pass);
         	
 
