@@ -110,10 +110,13 @@ public class LaunchApp {
 //      System.out.println("=======================");
 //  }
   
-  public static boolean isAdmin()
+  public static int isAdmin()
   {
+	  // 0 -> admin
+	  // 1 -> user
+	  // 2 -> wrong username or password
 	  
-	  return false;
+	  return 0;
   }
   
   public static void displayAdminInterface(){
@@ -181,7 +184,7 @@ public class LaunchApp {
       // dispatch request based on selection
       if (selection != 0) {
         if (selection == 1) {
-        		if(isAdmin())
+        		if(isAdmin() == 0)
         		{
         			boolean adminLogged = true;
         			   int adminChoice = 0;
@@ -211,44 +214,47 @@ public class LaunchApp {
        	            	}
         		}
         	}
+        		else if(isAdmin() == 1)
+        		{
+        			boolean userLogged = true;
+     			   int userChoice = 0;
+    	            while(userLogged){
+         			displayAdminInterface();
+    	            	String choice = in.nextLine().trim();
+    	            	//parsing use input //handling invalid input format exception
+    	            	try {
+    	                    userChoice = Integer.parseInt(choice);
+    	                  } catch (NumberFormatException e) {
+    	                    System.out.println("Invalid option! Please select a valid option!");
+    	                    continue;
+    	                  }
+    	            	
+    	            	//process the options = dispatch functions based on selected option
+    	            	
+    	            	if(userChoice == 1){
+    	            		
+    	            	}else if(userChoice == 2){
+    	            		
+    	            	}else if(userChoice == 3){
+    	            		
+    	            	}else if(userChoice == 4){
+    	            		
+    	            	}else if(userChoice == 5){
+    	            		
+    	            	}else if(userChoice == 6){
+    	            		userLogged = false;
+    	            	}else{
+    	            		System.out.println("Not a valid option");
+    	            	}
+     		}
+        		}
         		else
         		{
             		System.out.println("Invalid username or password. Please try again!");        			
         		}
         }else if (selection == 2) {
-    		if(!isAdmin())
-    		{
-    			boolean userLogged = true;
-    			   int userChoice = 0;
-   	            while(userLogged){
-        			displayAdminInterface();
-   	            	String choice = in.nextLine().trim();
-   	            	//parsing use input //handling invalid input format exception
-   	            	try {
-   	                    userChoice = Integer.parseInt(choice);
-   	                  } catch (NumberFormatException e) {
-   	                    System.out.println("Invalid option! Please select a valid option!");
-   	                    continue;
-   	                  }
-   	            	
-   	            	//process the options = dispatch functions based on selected option
-   	            	
-   	            	if(userChoice == 1){
-   	            		
-   	            	}else if(userChoice == 2){
-   	            		
-   	            	}else if(userChoice == 3){
-   	            		
-   	            	}else if(userChoice == 4){
-   	            		
-   	            	}else if(userChoice == 5){
-   	            		
-   	            	}else if(userChoice == 6){
-   	            		userLogged = false;
-   	            	}else{
-   	            		System.out.println("Not a valid option");
-   	            	}
-    		}
+    		
+        	System.out.println("Please try signing in using your credentials!");
     	}
     		else
     		{
@@ -266,5 +272,4 @@ public class LaunchApp {
     in.close();
     connect.closeConnection();
   }
-}
 }
