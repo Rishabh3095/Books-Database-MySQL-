@@ -73,9 +73,26 @@ public class LaunchApp {
 	  
   }
   
-  public static void adminAddItem()
+  public static void adminAddItem(String name, int price, String description, String category, int stock) throws SQLException
   {
-	  
+//	    int result = 0;
+	    try {
+	      preparedStatement =
+	          connection.prepareStatement("INSERT into Items(Name, Price, Description, Category, Stock) values (?, ?, ?, ?, ?);");
+
+	      preparedStatement.setString(1, name);
+	      preparedStatement.setInt(2, price);
+	      preparedStatement.setString(3, description);
+	      preparedStatement.setString(4, category);
+	      preparedStatement.setInt(5, stock);
+	      preparedStatement.executeUpdate();
+
+	    } catch (SQLException e) {
+	      e.printStackTrace();
+	    } finally {
+	      preparedStatement.close();
+	    }
+//	    return result;
   }
 
   public static void adminDeleteItem()
@@ -222,6 +239,23 @@ public class LaunchApp {
        	            	//process the options = dispatch functions based on selected option
        	            	
        	            	if(adminChoice == 1){
+       	            		
+       	            		System.out.println("Please enter the name of the item: ");
+       	            		String name = in.nextLine();
+       	            		
+       	            		System.out.println("Please enter the price of the item: ");
+       	            		int price  = in.nextInt();
+       	            		
+       	            		System.out.println("Please enter the description of the item: ");
+       	            		String description = in.nextLine();
+       	            		
+       	            		System.out.println("Please enter the categories of the item seperated by a comma: ");
+       	            		String category = in.nextLine();
+       	            		
+       	            		System.out.println("Please enter the quantity of the item: ");
+       	            		int stock = in.nextInt();
+       	            		       	            		
+       	            		adminAddItem(name, price, description, category, stock);
        	            		
        	            	}else if(adminChoice == 2){
        	            		

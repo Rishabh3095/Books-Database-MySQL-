@@ -7,14 +7,14 @@ public class Items {
 	int Price;
 	String Description;
 	String Category;
-	String Stock;
+	int Stock;
 	
 	public Items(	int iID,
 	String Name,
 	int Price,
 	String Description,
 	String Category,
-	String Stock) {
+	int Stock) {
 		
 		this.iID = iID;
 		this.Name = Name;
@@ -65,11 +65,11 @@ public class Items {
 		Category = category;
 	}
 
-	public String getStock() {
+	public int getStock() {
 		return Stock;
 	}
 
-	public void setStock(String stock) {
+	public void setStock(int stock) {
 		Stock = stock;
 	}
 	
