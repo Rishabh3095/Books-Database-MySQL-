@@ -12,39 +12,33 @@ import util.ConnectDB;
 
 public class LaunchApp {
 
-  static Scanner in = new Scanner(System.in);
-  static Connection connection = null;
-  private static PreparedStatement preparedStatement = null;
-  private static Statement statement = null;
-
-  public LaunchApp()
-  {
-	  
-  }
+	Connection connection;
+	Statement statement;
+	Scanner in = new Scanner(System.in);
+	PreparedStatement signUpPreparedStatement;
+	boolean isAdmin;
+	
+	public LaunchApp()
+	{ 
+		try
+		{
+			ConnectDB connect = new ConnectDB();
+			// open a connection
+			connection = connect.connection;
+			statement = connection.createStatement();
+			//selecting database to perform queries on
+			statement.executeQuery("USE ONLINERETAILER"); 
+			signUpPreparedStatement = connection.prepareStatement("insert into users(Name, Email, CreditCard, Address, Password, admin) values (?, ?, ?, ?, ?, 0)");
+			isAdmin = false;
+		}
+		catch(Exception e)
+		{
+			System.out.println("Issue connecting with database: " + e);
+		}
+	}
   
-  
-  
-  public static void viewOrders()
-  {
-	  
-  }
-  
-  public static void searchItem()
-  {
-	  
-  }
-  
-  public static void viewCart()
-  {
-	  
-  }
-  
-  public static void checkout()
-  {
-	  
-  }
-  
-  public static void login()
+    
+  public Users login()
   {
 	  Scanner in = new Scanner(System.in);
 	  
@@ -54,84 +48,58 @@ public class LaunchApp {
 	  System.out.print("/nPlease enter the password: ");
 	  String pass = in.nextLine();
 	  
-//	  preparedStatement.exe
-	 
-  }
-
-  public static void createUser()
-  {
 	  
+	  //DHRUV STARTS HERE
+	  
+	  //return True is the user is an admin
+	  
+	  //return False if they are a normal user
+	  isAdmin = false;
+	  if (isAdmin == true)
+	  {
+		return null;  
+	  }
+	  else
+	  {
+		//return a Users object  
+	  }
+	  return null; //remove after implementing returning a Users object
   }
   
-  public static void userLogOut()
+  public Users signUp(String name, String email, String cc, String add, String pass)
   {
-	  
-  }
-
-  public static void adminLogout()
-  {
-	  
-  }
-  
-  public static void adminAddItem(String name, int price, String description, String category, int stock) throws SQLException
-  {
-//	    int result = 0;
-	    try {
-	      preparedStatement =
-	          connection.prepareStatement("INSERT into Items(Name, Price, Description, Category, Stock) values (?, ?, ?, ?, ?);");
-
-	      preparedStatement.setString(1, name);
-	      preparedStatement.setInt(2, price);
-	      preparedStatement.setString(3, description);
-	      preparedStatement.setString(4, category);
-	      preparedStatement.setInt(5, stock);
-	      preparedStatement.executeUpdate();
-
-	    } catch (SQLException e) {
-	      e.printStackTrace();
-	    } finally {
-	      preparedStatement.close();
-	    }
-//	    return result;
-  }
-
-  public static void adminDeleteItem()
-  {
-	  
-  }
-  
-  public static void adminUpdateItem()
-  {
-	  
-  }
-
-  
-  public static void signUp(String name, String email, String cc, String add, String pass)
-  {
-	  try {
-		preparedStatement = connection.prepareStatement("insert into users(Name, Email, CreditCard, Address, Password, admin) values (?, ?, ?, ?, ?, 0)");
-		preparedStatement.setString(1, name);
-	  	preparedStatement.setString(2, email);
-	  	preparedStatement.setString(3, cc);
-	  	preparedStatement.setString(4, add);
-	  	preparedStatement.setString(5, pass);
-	  	preparedStatement.executeUpdate();
-	} catch (SQLException e) {
+	  try 
+	  {
+		  signUpPreparedStatement.setString(1, name);
+		  signUpPreparedStatement.setString(2, email);
+		  signUpPreparedStatement.setString(3, cc);
+		  signUpPreparedStatement.setString(4, add);
+		  signUpPreparedStatement.setString(5, pass);
+		  signUpPreparedStatement.executeUpdate();
+		  ResultSet rs = statement.executeQuery("Select * from users;");// where name = \" " + name + " \" and password = \" " + pass + "\" ;" );
+		  
+		  while (rs.next())
+		  {
+			  if (rs.getString(2).equals(name) && rs.getString(6).equals(pass) && rs.getString(3).equals(email))
+			  {
+				  System.out.println("Found User: " + rs.getString(2));
+				  int userID = rs.getInt(1);
+				  int creditCard = Integer.parseInt(cc);
+				  return new Users(connection, statement, userID, name, email, creditCard, add, pass);   
+			  }
+		  }
+	  } 
+	  catch (SQLException e) 
+	  {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
-	}
 		
+	  }
+	  return null;
   
   }
-  
-  
-  public static void addItem() throws SQLException {
-	  
-	  statement.execute("insert into Orders(oID, items, uID) values (1000, \"check\", 5);");
-	  
-  }
-  
-  public static void loginOrSignUp(){
+    
+  public void loginOrSignUp(){
 	  System.out.println("Please select an option from the menu:");
 	  System.out.println("=======================");
       System.out.println("|1. Login|");
@@ -139,211 +107,85 @@ public class LaunchApp {
       System.out.println("=======================");
   }
 
-//  public static void loginOrSignUp(){
-//	  System.out.println("Please select an option from the menu:");
-//	  System.out.println("=======================");
-//      System.out.println("|1. Login|");
-//      System.out.println("|2. Sign Up|");
-//      System.out.println("=======================");
-//  }
-  
-  public static int isAdmin()
-  {
-	  // 0 -> admin
-	  // 1 -> user
-	  // 2 -> wrong username or password
-	  
-	  return 0;
-  }
-  
-  public static void displayAdminInterface(){
-	  System.out.println("Please select an option from the menu:");
-	  System.out.println("=======================");
-      System.out.println("|1. Add Item|");
-      System.out.println("|2. Delete Item|");
-      System.out.println("|3. Update Item|");
-      System.out.println("|4. Logout|");
-      System.out.println("=======================");
-  }
-    
   
   
-  public static void displayUserInterface(){
-	  System.out.println("Please select an option from the menu:");
-	  System.out.println("=======================");
-      System.out.println("|1. View Orders|");
-      System.out.println("|2. Search for Item|");
-      System.out.println("|3. View Cart|");
-      System.out.println("|4. Checkout|");
-      System.out.println("|5. Remove Item from List|");
-      System.out.println("|6. Logout|");
-      System.out.println("=======================");
-  }
   
+ 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
 
-  public static void main(String[] args) throws SQLException, InterruptedException, ParseException {
-    ConnectDB connect = new ConnectDB();
-    // open a connection
-    connection = connect.connection;
-    statement = connection.createStatement();
+  public static void main(String[] args) throws SQLException, InterruptedException, ParseException 
+  {
     
-    //selecting database to perform queries on
-    statement.executeQuery("USE ONLINERETAILER");      
-
-    System.out.println("Please select a number for the corresponding option or enter q to quit:");
-
+    LaunchApp app = new LaunchApp();
     
-    while (true) {
-
-    loginOrSignUp();
+    boolean appRunning = true;
+   
     
-    
-      int selection = 0; //initialize selection to prevent null pointer exception
-      String option = in.nextLine().trim();
+    while (appRunning) 
+    {
+    	System.out.println("Please select a number for the corresponding option or enter q to quit:");
+    	app.loginOrSignUp();
 
-      if (option.equals("q") || option.equals("q")) {
-        System.out.println("Thank you!");
-        break;
-      }
-      
-      try {
-        selection = Integer.parseInt(option);
-      } catch (NumberFormatException e) {
-        System.out.println("Invalid option! Please select a valid option!");
-        loginOrSignUp();
-        continue;
-      }
+    	int selection = 0; //initialize selection to prevent null pointer exception
+    	String option = app.in.nextLine().trim();
 
-      
-      
-      // dispatch request based on selection
-      if (selection != 0) {
-        if (selection == 1) {
-        		if(isAdmin() == 0)
-        		{
-        			boolean adminLogged = true;
-        			   int adminChoice = 0;
-       	            while(adminLogged){
-            			displayAdminInterface();
-       	            	String choice = in.nextLine().trim();
-       	            	//parsing use input //handling invalid input format exception
-       	            	try {
-       	                    adminChoice = Integer.parseInt(choice);
-       	                  } catch (NumberFormatException e) {
-       	                    System.out.println("Invalid option! Please select a valid option!");
-       	                    continue;
-       	                  }
-       	            	
-       	            	//process the options = dispatch functions based on selected option
-       	            	
-       	            	if(adminChoice == 1){
-       	            		
-       	            		System.out.println("Please enter the name of the item: ");
-       	            		String name = in.nextLine();
-       	            		
-       	            		System.out.println("Please enter the price of the item: ");
-       	            		int price  = in.nextInt();
-       	            		
-       	            		System.out.println("Please enter the description of the item: ");
-       	            		String description = in.nextLine();
-       	            		
-       	            		System.out.println("Please enter the categories of the item seperated by a comma: ");
-       	            		String category = in.nextLine();
-       	            		
-       	            		System.out.println("Please enter the quantity of the item: ");
-       	            		int stock = in.nextInt();
-       	            		       	            		
-       	            		adminAddItem(name, price, description, category, stock);
-       	            		
-       	            	}else if(adminChoice == 2){
-       	            		
-       	            	}else if(adminChoice == 3){
-       	            		       	            			
-       	            	}else if(adminChoice == 4){
-       	            		adminLogged = false;
-       	            	}else{
-       	            		System.out.println("Not a valid option");
-       	            	}
-        		}
+    	if (option.toLowerCase().equals("q")) 
+    	{
+    		System.out.println("Thank you!");
+    		appRunning = false;
+    	}
+  
+       selection = Integer.parseInt(option); 
+       
+       	//Login Option
+        if (selection == 1) 
+        {
+        	//Login UI
+        	Users user = app.login();
+        	
+        	if (app.isAdmin == true)
+        	{
+        		Admin admin = new Admin(app.connection, app.statement);
+        		admin.startAdmin();
         	}
-        		else if(isAdmin() == 1)
-        		{
-        			boolean userLogged = true;
-     			   int userChoice = 0;
-    	            while(userLogged){
-         			displayAdminInterface();
-    	            	String choice = in.nextLine().trim();
-    	            	//parsing use input //handling invalid input format exception
-    	            	try {
-    	                    userChoice = Integer.parseInt(choice);
-    	                  } catch (NumberFormatException e) {
-    	                    System.out.println("Invalid option! Please select a valid option!");
-    	                    continue;
-    	                  }
-    	            	
-    	            	//process the options = dispatch functions based on selected option
-    	            	
-    	            	if(userChoice == 1){
-    	            		
-    	            	}else if(userChoice == 2){
-    	            		
-    	            	}else if(userChoice == 3){
-    	            		
-    	            	}else if(userChoice == 4){
-    	            		
-    	            	}else if(userChoice == 5){
-    	            		
-    	            	}else if(userChoice == 6){
-    	            		userLogged = false;
-    	            	}else{
-    	            		System.out.println("Not a valid option");
-    	            	}
-     		}
-        		}
-        		else
-        		{
-            		System.out.println("Invalid username or password. Please try again!");        			
-        		}
-        }else if (selection == 2) {
+        	else
+        	{
+        		//Display all user stuff
+        		user.startUser();
+        	}
+        }
+        else if (selection == 2)
+        {
         	//sign up for the user
         	System.out.println("Please Enter Your Name: ");
-        	String name = in.nextLine().trim();
+        	String name = app.in.nextLine().trim();
         	
         	System.out.println("Please Enter Your Email: ");
-        	String email = in.nextLine().trim();
+        	String email = app.in.nextLine().trim();
         	
         	System.out.println("Please Enter Your CreditCard: ");
-        	String cc = in.nextLine().trim();
+        	String cc = app.in.nextLine().trim();
      
         	System.out.println("Please Enter Your Address: ");
-        	String add = in.nextLine().trim();
+        	String add = app.in.nextLine().trim();
         	
         	System.out.println("Please Enter Your Password: ");
-        	String pass = in.nextLine().trim();
+        	String pass = app.in.nextLine().trim();
         	
-			signUp(name, email, cc, add, pass);
-        	
-//        	System.out.println(name + email + cc + add + pass);
-        	
-
-        	System.out.println("Please try signing in using your credentials!");
-    	}
-    		else
-    		{
-        		System.out.println("Invalid username or password. Please try again!");        			
-    		}
-        }  else {
-          System.out.println("Invalid option! Please choose a valid option from the menu.");
+			Users user = app.signUp(name, email, cc, add, pass);     
+			
+			if (user != null)
+			{
+				user.startUser();
+			}
         }
-      
-        System.out.println(
-            "Please select a number for the corresponding option or enter q to quit:");
-        //logs out ad comes to this
-        loginOrSignUp();
+        else
+        {
+        	System.out.println("Invalid Option.");
+        }
+      		 
     }
-    in.close();
-    connect.closeConnection();
+     
   }
 }
