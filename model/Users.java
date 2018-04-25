@@ -16,6 +16,8 @@ public class Users {
 	String Password;
 	Scanner in;
 	PreparedStatement viewOrdersPreparedStatement;
+	PreparedStatement createOrderPreparedStatement;
+        PreparedStatement decrementStockPreparedStatement;
 	List<Item> cart;
 	
 	public Users(Connection c, Statement s, int uID, String Name, String Email, int CreditCard, String Address, String Password)
@@ -33,6 +35,9 @@ public class Users {
 			
 			//All Prepared Statements
 			viewOrdersPreparedStatement = (PreparedStatement) c.prepareStatement("Select * from users where uID = ?;");
+			createOrderPreparedStatement = (PreparedStatement) c.prepareStatement("Insert into orders(items,uID) values (?,?);");
+                        decrementStockPreparedStatement = (PreparedStatement) c.prepareStatement("CALL decrementStock(?);");
+                
 		}
 		catch(Exception e)
 		{
@@ -162,7 +167,24 @@ public class Users {
 		 //MICHAEL STARTS HERE
 		 try
 		 {
-			 
+			if (cart.isEmpty())
+			 System.out.println("Cart is Empty");
+                    	else{
+                         String items = ""; //A Comma-seperated value of the item id numbers in the cart
+                         for (int i = 0; i < cart.size(); i++){
+                             if (cart.get(i).Stock > 0){
+                                items += Integer.toString(cart.get(i).iID);
+                                decrementStockPreparedStatement.setInt(1,cart.get(i).iID);
+                                decrementStockPreparedStatement.execute();
+                                if (i < cart.size()-1)
+                                    items += ",";
+                             }
+                         }
+                         createOrderPreparedStatement.setString(1, items);
+                         createOrderPreparedStatement.setInt(2, uID);
+                         createOrderPreparedStatement.executeUpdate();
+                         cart.clear();
+                         System.out.println("Order had been placed!");
 		 }
 		 catch (Exception e)
 		 {
