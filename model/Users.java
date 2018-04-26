@@ -36,7 +36,7 @@ public class Users {
 			cart = new ArrayList<Item>();
 
 			//All Prepared Statements
-			viewOrdersPreparedStatement = (PreparedStatement) c.prepareStatement("Select * from users where uID = ?;");
+			viewOrdersPreparedStatement = (PreparedStatement) c.prepareStatement("Select * from orders where uID = ?;");
 			createOrderPreparedStatement = (PreparedStatement) c.prepareStatement("Insert into orders(items,uID) values (?,?);");
 			decrementStockPreparedStatement = (PreparedStatement) c.prepareStatement("CALL decrementStock(?);");
 			searchByCategory = (PreparedStatement) c.prepareStatement("Select * from items where Category = ? and stock <> 0 Order by Price asc;");

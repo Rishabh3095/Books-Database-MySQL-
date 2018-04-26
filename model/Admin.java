@@ -7,11 +7,13 @@ import java.sql.*;
 public class Admin 
 {
 	Scanner in;
-	Scanner ini;
+	
 	Connection connection;
 	PreparedStatement addItemPreparedStatement;
 	PreparedStatement deleteItemPreparedStatement;
 	PreparedStatement updateItemPreparedStatement;
+	PreparedStatement viewAllUserOrders;
+
 	Statement statement;
 	
 	public Admin(Connection c, Statement s)
@@ -24,6 +26,8 @@ public class Admin
 			addItemPreparedStatement = (PreparedStatement) connection.prepareStatement("INSERT into Items(Name, Price, Description, Category, Stock) values (?, ?, ?, ?, ?);");
 			deleteItemPreparedStatement = (PreparedStatement) connection.prepareStatement("Delete from Items where iID = ?;");
 			updateItemPreparedStatement = (PreparedStatement) connection.prepareStatement("Update Items set Name = ?, Price = ?, Description = ?, Category = ?, Stock = ? where iID = ?");
+			viewAllUserOrders = (PreparedStatement) connection.prepareStatement("select items from orders where uID = (select uID from users where uID = ?)");
+
 		}
 		catch (Exception e)
 		{
@@ -34,7 +38,6 @@ public class Admin
 	public void startAdmin()
 	{
 		boolean adminLogged = true;
-		int adminChoice;
 		
 		while(adminLogged)
 		{
@@ -42,6 +45,8 @@ public class Admin
 			{
 				displayAdminInterface();
 				String choice = in.nextLine().trim();
+				int adminChoice;
+
 				//parsing user input 
 				try 
 				{
@@ -62,7 +67,9 @@ public class Admin
 			   				break;
 			   		case 3: updateItem();
 			   				break;
-			   		case 4: System.out.println("Logging Out...");
+			   		case 4: viewAllOrders();
+			   				break;
+			   		case 5: System.out.println("Logging Out...");
 			   				adminLogged = false;
 			   				break;
 			   		default: System.out.println("Not a valid option");
@@ -81,10 +88,11 @@ public class Admin
 	{
 	  System.out.println("Please select an option from the menu:");
 	  System.out.println("=======================");
-	  System.out.println("|1. Add Item		|");
-	  System.out.println("|2. Delete Item	|");
-	  System.out.println("|3. Update Item	|");
-	  System.out.println("|4. Logout		|");
+	  System.out.println("|1. Add Item			|");
+	  System.out.println("|2. Delete Item		|");
+	  System.out.println("|3. Update Item		|");
+	  System.out.println("|4. View All Orders	|");
+	  System.out.println("|5. Logout			|");
 	  System.out.println("=======================");
 	}
 	
@@ -97,7 +105,7 @@ public class Admin
 		try
 		{
 			//asking for info regarding the item to be added
-			
+			Scanner ini = new Scanner(System.in);
 			System.out.println("Please enter the name of the item: ");
 			String name = in.nextLine();
 
@@ -154,6 +162,7 @@ public class Admin
 	//Delete item
 	public void deleteItem() throws SQLException
 	{
+		Scanner ini = new Scanner(System.in);
 		//asking for info regarding the item to be updated
 		System.out.println("Please enter the ID of the item to be deleted: ");
 		int id = ini.nextInt();
@@ -178,11 +187,25 @@ public class Admin
 
 	}
 	
+	public void viewAllOrders() throws SQLException
+	{
+		Scanner ini = new Scanner(System.in);
+		//asking for info regarding the item to be updated
+		System.out.println("Please enter the ID of the user to view his orders: ");
+		int id = ini.nextInt();
+		viewAllUserOrders.setInt(1, id);		
+		viewAllUserOrders.executeQuery();
+		
+	}
+		
+		
+		
+	
 	//update item
 	public void updateItem()
 	{
 		//asking for info regarding the item to be deleted
-		
+		Scanner ini = new Scanner(System.in);
 		System.out.println("Please enter the ID of the item to be updated: ");
 		int id = ini.nextInt();
 		
