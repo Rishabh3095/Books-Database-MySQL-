@@ -202,29 +202,35 @@ public class Users {
 			int orderNumber = 0; //Used to present the orders
 			boolean firstOrder = false; //Set to false to see if users
                         
+			//Loops while the result set still has data in it
 			while(rs.next())
 			{
-			double orderTotal = 0.00;	
+			double orderTotal = 0.00; //The final total for the current order (initialized for each order)	
                         if (!firstOrder)
 				{
 					System.out.println("Previous orders " + rs.getString(2) +  " purchased: ");
-					firstOrder = true;
+					firstOrder = true; //Only need to do this step for the very first order
 				}
 				orderNumber++;
                                 System.out.println("Order Number " + orderNumber + ": ");
-                                String[] items = rs.getString(1).split(",");
-                                for (int i = 0; i < items.length; i++){
-                                    int itemID = Integer.parseInt(items[i]);
+                                String[] items = rs.getString(1).split(","); //Split the item numbers in order to look each up in the database
+                                
+				//Loops through all the items in the order
+				for (int i = 0; i < items.length; i++){
+                                    int itemID = Integer.parseInt(items[i]); //Convert the item number into an integer datatype
+					//Look for the item in the database by the item number
                                     searchSpecificItem.setInt(1, itemID);
                                     ResultSet itemRS = searchSpecificItem.executeQuery();
                                     itemRS.next();
+					
                                     System.out.println("\t" + Integer.toString(i+1) + ". " + itemRS.getString(2) + ": $" + itemRS.getDouble(3));
-                                    orderTotal += itemRS.getDouble(3);
+                                    orderTotal += itemRS.getDouble(3); //Add the price to the item number
                                 }
-                                System.out.println("\tTOTAL: $" + Math.round(orderTotal*100.0)/100.0);
+                                System.out.println("\tTOTAL: $" + Math.round(orderTotal*100.0)/100.0); //Math.round used to ensure the correct number of decimal digits
 				
 			}
-			if (!firstOrder)
+			//Means no orders were places by the user
+			if (!firstOrder) 
 			{
 				System.out.println("There are no previous orders");
 			}
@@ -242,15 +248,14 @@ public class Users {
 	 */
 	public void searchForItems()
 	{
-		//ZAHRA STARTS HERE
 		try
 		{
-			boolean runningSearch = true;
+			boolean runningSearch = true; //Makes sure the search menu is out
 			while (runningSearch)
 			{
 				displaySearchInterface();
 				String choice = in.nextLine().trim();
-				int userChoice;
+				int userChoice; //The user's selection
 
 				try 
 				{
@@ -264,11 +269,11 @@ public class Users {
 
 				switch (userChoice)
 				{
-					case 1: searchByCategory();
+					case 1: searchByCategory(); //If the user wants to pick a certain category
 							break;
-					case 2: searchAllItems();
+					case 2: searchAllItems(); //If the user wants a list of all items
 							break;
-					case 3:	System.out.println("Back to main menu...");
+					case 3:	System.out.println("Back to main menu..."); //Goes back to the main display
 							runningSearch = false;
 							break;
 					default:System.out.println("Not a valid option");
@@ -290,16 +295,16 @@ public class Users {
 	public void searchByCategory()
 	{
 		try {
-			boolean runningSearch = true;
-			String category = "";
-			boolean continueSearch = false;
+			boolean runningSearch = true; //Keeps the menu up
+			String category = ""; //Where the category to look for in the database will go
+			boolean continueSearch = false; //If the user has selected a category, this will be true to get the items needed
 
 			while (runningSearch)
 			{
-				continueSearch = false;
-				displayCategories();
+				continueSearch = false; //Sets it to false for every loop
+				displayCategories(); //Shows the categories
 				String choice = in.nextLine().trim();
-				int userChoice;
+				int userChoice; //Where the choice will go
 
 				try 
 				{
@@ -310,7 +315,8 @@ public class Users {
 					System.out.println("Invalid option! Please select a valid option!");
 					continue;
 				}
-
+				
+				//A list of all the categories in the database
 				switch (userChoice)
 				{
 					case 1: category = "Beauty and Health"; 
@@ -332,6 +338,7 @@ public class Users {
 							break;							
 				}
 				
+				//When a valid category has been selected, will search for items based on the category and display them
 				if(continueSearch) {
 					ResultSet rs = searchByCategory.executeQuery();
 					selectItem(rs);
@@ -371,20 +378,22 @@ public class Users {
 	{
 		try
 		{
-			ArrayList<Item> items = new ArrayList<Item>();
+			ArrayList<Item> items = new ArrayList<Item>(); //Where the list of items will go
 			
+			//Loops through the result set to place all the items into an array of Item models
 			while(rs.next())
 			{
 				Item newItem = new Item(rs.getInt(1), rs.getString(2), rs.getDouble(3), rs.getString(4), rs.getString(5), rs.getInt(6));
 				items.add(newItem);
 			}
 
-			int goBackOption = items.size() + 1;
-			boolean runningSearch = true;
+			int goBackOption = items.size() + 1; //The final choice will be to go back to the category menu
+			boolean runningSearch = true; //Keeps the menu up
 
 			while (runningSearch)
 			{
-				displayItems(items);
+				//Displays the items and gets the selection the user makes
+				displayItems(items); 
 				String choice = in.nextLine().trim();
 				int userChoice;
 
@@ -398,22 +407,27 @@ public class Users {
 					continue;
 				}
 				
+				//Ends the search when the user picks the final option
 				if(userChoice == goBackOption)
 					runningSearch = false;
 				else
 				{
+					//Adds the item to the cart
 					Item addToCart = items.get(userChoice - 1);
-					int cartCount = 0;
+					int cartCount = 0; //Used to keep track of the number of the chosen item in the cart
 					
+					//For each item, if the item name is the same as an item in the cart, increment the cartCount
 					for(Item cartItem : cart) {
 						if(cartItem.Name == addToCart.Name)
 							cartCount++;
 					}
 					
+					//If the stock of the item selected is greater than the number of that item in the cart, add it to the cart
 					if(addToCart.Stock > cartCount) {
 						cart.add(addToCart);
 						System.out.println("This item has been added to your cart.\n\n");
 					}
+					//Otherwise, do not add it and let the user know
 					else
 						System.out.println("This item is out of stock. Please select a different item. ");
 						
@@ -427,67 +441,91 @@ public class Users {
 
 	}
 	
-	
+	/**
+	*View the user's current cart
+	*/
 	public void viewCart()
 	{
-                double cartTotal = 0.0;
+                double cartTotal = 0.0; //Keeps track of the total monetary value of the cart
+		
+		//Loops through the cart to display the items and to add up the current price
 		for (int i = 0; i < cart.size(); i++)
 		{
 			Item currentItem = cart.get(i);
 			System.out.println("Name: " + currentItem.Name + ", Price: $" + currentItem.Price);
                         cartTotal += currentItem.Price;
 		}
+		
                 System.out.println("TOTAL: $" + Math.round(cartTotal*100.0)/100.0);
 	}
-
+	
+	/**
+	*Used to make the order to the system
+	*/
 	public void checkout()
 	{
 		try
 		{
+			//If the cart is empty, don't create an order
 			if (cart.isEmpty())
 				System.out.println("Cart is Empty");
 			else{
 				String items = ""; //A Comma-seperated value of the item id numbers in the cart
+				
+				//Loop through each item in the cart to decrement the stock of that item in the system
 				for (int i = 0; i < cart.size(); i++){
 					if (cart.get(i).Stock > 0){
-						items += Integer.toString(cart.get(i).iID);
+						items += Integer.toString(cart.get(i).iID); //Converts the item ID into a string
+						
+						//Uses the item ID to decrement the stock of that item in the system
 						decrementStockPreparedStatement.setInt(1,cart.get(i).iID);
 						decrementStockPreparedStatement.execute();
+						
+						//For every item that isn't the last item in the cart, add a comma after it for the system
 						if (i < cart.size()-1)
 							items += ",";
 					}
 				}
+				//Upload the user id and the comma-seperated item ID list into the system
 				createOrderPreparedStatement.setString(1, items);
 				createOrderPreparedStatement.setInt(2, uID);
 				createOrderPreparedStatement.executeUpdate();
+				
+				//Clear the cart for future uses
 				cart.clear();
 				System.out.println("Order had been placed!");
 			}
 		}
 		catch (Exception e)
 		{
-			System.out.println("Error in checking out: " + e);
+			System.out.println("Error in checking out");
 		}
 
 
 	}
-
+	
+	/**
+	*Remove an item from the stock
+	*/
 	public void removeItemFromCart()
 	{
-		boolean validItem = false;
+		boolean validItem = false; //Loops through until a valid item has been selected for removal
 		while (!validItem)
 		{
 			try
 			{
 				System.out.println("Please select a number to remove:");
+				
+				//Loops through the cart to get each item in there and assign it a number the user will user to delete it
 				for (int i = 0; i < cart.size(); i++)
 				{
 					Item item = cart.get(i);
 					System.out.println((i+1) + " ) " + item.Name);
 				}
-				int removeNumber = in.nextInt();
+				int removeNumber = in.nextInt(); //The number of the item that will be removed
 				try
 				{
+					//Remove the item from the cart and end the loop
 					cart.remove((removeNumber-1));
 					validItem = true;
 				}
