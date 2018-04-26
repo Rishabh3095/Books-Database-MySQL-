@@ -16,6 +16,8 @@ public class LaunchApp {
 	Statement statement;
 	Scanner in = new Scanner(System.in);
 	PreparedStatement signUpPreparedStatement;
+	PreparedStatement loginPreparedStatement1;
+	PreparedStatement loginPreparedStatement2;
 	boolean isAdmin;
 	
 	public LaunchApp()
@@ -29,6 +31,9 @@ public class LaunchApp {
 			//selecting database to perform queries on
 			statement.executeQuery("USE ONLINERETAILER"); 
 			signUpPreparedStatement = connection.prepareStatement("insert into users(Name, Email, CreditCard, Address, Password, admin) values (?, ?, ?, ?, ?, 0)");
+			loginPreparedStatement1 = connection.prepareStatement("SELECT * FROM users WHERE Email = ? and Password = ?");
+			
+
 			isAdmin = false;
 		}
 		catch(Exception e)
@@ -42,27 +47,48 @@ public class LaunchApp {
   {
 	  Scanner in = new Scanner(System.in);
 	  
-	  System.out.print("Please enter the user name: ");
+	  System.out.print("Please enter the email: ");
 	  String username = in.nextLine();
 	  
-	  System.out.print("/nPlease enter the password: ");
+	  System.out.print("Please enter the password: ");
 	  String pass = in.nextLine();
 	  
 	  
 	  //DHRUV STARTS HERE
-	  
+	  try
+	  {
+		  loginPreparedStatement1.setString(1, username);
+		  loginPreparedStatement1.setString(2, pass);
+		  
+
+		  ResultSet rs = loginPreparedStatement1.executeQuery();
+		  
+		  while(rs.next())
+		  {	
+			  if(rs.getInt(7) == 1)
+			  {
+				  isAdmin = true;
+				  return null;
+			  }
+			  else 
+			  {
+				  String a = rs.getString(4);
+				  Long b = Long.parseLong(a);
+				  System.out.println(b);
+				  return new Users(connection, statement,rs.getInt(1), rs.getString(2), rs.getString(3), b, rs.getString(5), rs.getString(6)); 
+			  }
+		  }
+
+		  
+	  }
+	  catch(Exception e)
+	  {
+		  System.out.println("Error logging in" + e);
+	  }
 	  //return True is the user is an admin
 	  
 	  //return False if they are a normal user
-	  isAdmin = false;
-	  if (isAdmin == true)
-	  {
-		return null;  
-	  }
-	  else
-	  {
-		//return a Users object  
-	  }
+	 
 	  return null; //remove after implementing returning a Users object
   }
   
@@ -70,6 +96,8 @@ public class LaunchApp {
   {
 	  try 
 	  {
+		  
+		  
 		  signUpPreparedStatement.setString(1, name);
 		  signUpPreparedStatement.setString(2, email);
 		  signUpPreparedStatement.setString(3, cc);
@@ -77,23 +105,23 @@ public class LaunchApp {
 		  signUpPreparedStatement.setString(5, pass);
 		  signUpPreparedStatement.executeUpdate();
 		  ResultSet rs = statement.executeQuery("Select * from users;");// where name = \" " + name + " \" and password = \" " + pass + "\" ;" );
-		  
+		  System.out.println(rs);
 		  while (rs.next())
 		  {
+			  System.out.println(rs);
+
 			  if (rs.getString(2).equals(name) && rs.getString(6).equals(pass) && rs.getString(3).equals(email))
 			  {
 				  System.out.println("Found User: " + rs.getString(2));
 				  int userID = rs.getInt(1);
-				  int creditCard = Integer.parseInt(cc);
+				  long creditCard = Long.parseLong(cc);
 				  return new Users(connection, statement, userID, name, email, creditCard, add, pass);   
 			  }
 		  }
 	  } 
 	  catch (SQLException e) 
 	  {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-		
+		e.printStackTrace();		
 	  }
 	  return null;
   
@@ -143,6 +171,11 @@ public class LaunchApp {
         {
         	//Login UI
         	Users user = app.login();
+        	
+        	
+        	
+        	
+        	
         	
         	if (app.isAdmin == true)
         	{

@@ -11,7 +11,7 @@ public class Users {
 	int uID;
 	String Name;
 	String Email;
-	int CreditCard;
+	long CreditCard;
 	String Address;
 	String Password;
 	Scanner in;
@@ -22,7 +22,7 @@ public class Users {
 	PreparedStatement searchAllItems;
 	List<Item> cart;
 
-	public Users(Connection c, Statement s, int uID, String Name, String Email, int CreditCard, String Address, String Password)
+	public Users(Connection c, Statement s, int uID, String Name, String Email, long CreditCard, String Address, String Password)
 	{
 		try
 		{
