@@ -7,22 +7,41 @@ import java.util.Scanner;
 
 
 public class Users {
-
+	// The user's data
 	int uID;
 	String Name;
 	String Email;
 	long CreditCard;
 	String Address;
 	String Password;
+	
+	//Scanner used to read the user's input
 	Scanner in;
+	
+	//All the prepared statements used to query the database
 	PreparedStatement viewOrdersPreparedStatement;
 	PreparedStatement createOrderPreparedStatement;
 	PreparedStatement decrementStockPreparedStatement;
 	PreparedStatement searchByCategory;
 	PreparedStatement searchAllItems;
         PreparedStatement searchSpecificItem;
+	
+	//The items the user has selected to purchase
 	List<Item> cart;
-
+	
+	/**
+	*Constructor to set up the user
+	*
+	*
+	*@param c The connection to the database
+	*@param s The statement used to modify and access the database
+	*@param uID The user's identification number
+	*@param Name The name of the user
+	*@param Email The email address of the user
+	*@param CreditCard The credit card number of the user
+	*@param Address The address of the user
+	*@param Password The password the user uses to access the application
+	**/
 	public Users(Connection c, Statement s, int uID, String Name, String Email, long CreditCard, String Address, String Password)
 	{
 		try
@@ -37,12 +56,12 @@ public class Users {
 			cart = new ArrayList<Item>();
 			
 			//All prepared statements
-			viewOrdersPreparedStatement = (PreparedStatement) c.prepareStatement("CALL getItemsOrdered(?);");
-			createOrderPreparedStatement = (PreparedStatement) c.prepareStatement("Insert into orders(items,uID) values (?,?);");
-			decrementStockPreparedStatement = (PreparedStatement) c.prepareStatement("CALL decrementStock(?);");
-			searchByCategory = (PreparedStatement) c.prepareStatement("Select * from items where Category = ? and stock <> 0 Order by Price asc;");
-			searchAllItems = (PreparedStatement) c.prepareStatement("Select * from items where stock <> 0 Order by Price asc;");
-                        searchSpecificItem = (PreparedStatement) c.prepareStatement("CALL getItem(?);");
+			viewOrdersPreparedStatement = (PreparedStatement) c.prepareStatement("CALL getItemsOrdered(?);"); //Used to view the orders
+			createOrderPreparedStatement = (PreparedStatement) c.prepareStatement("Insert into orders(items,uID) values (?,?);"); //Used to create the order
+			decrementStockPreparedStatement = (PreparedStatement) c.prepareStatement("CALL decrementStock(?);"); //Used to remove an item from the stock
+			searchByCategory = (PreparedStatement) c.prepareStatement("Select * from items where Category = ? and stock <> 0 Order by Price asc;"); //Used to select items based on the category
+			searchAllItems = (PreparedStatement) c.prepareStatement("Select * from items where stock <> 0 Order by Price asc;"); //Used to select all available items
+                        searchSpecificItem = (PreparedStatement) c.prepareStatement("CALL getItem(?);"); //Used to find a specific item based on the item ID
 		}
 		catch(Exception e)
 		{
@@ -50,7 +69,10 @@ public class Users {
 		}
 
 	}
-
+	
+	/**
+	*Prints out the main user interface
+	*/
 	public void displayUserInterface()
 	{
 		System.out.println();
@@ -64,7 +86,9 @@ public class Users {
 		System.out.println("|6. Logout				|");
 		System.out.println("=======================");
 	}
-
+	/**
+	*Prints out the search interface
+	*/
 	public void displaySearchInterface()
 	{
 		System.out.println();
@@ -75,7 +99,10 @@ public class Users {
 		System.out.println("|3. Go Back				|");
 		System.out.println("=======================");
 	}
-
+	
+	/**
+	*Prints out the categories selection interface
+	*/
 	public void displayCategories()
 	{
 		System.out.println();
@@ -96,24 +123,28 @@ public class Users {
 	 * @param items - list of items to be displayed
 	 */
 	public void displayItems(ArrayList<Item> items) {
-		int itemIndex = 1;
+		int itemIndex = 1; //Item index used to select the item to add to cart
 		System.out.println("Products:\n");
 		
+		//Loops through the items the user asked to display (either by category or every item)
 		for(Item item : items) {
 			System.out.print(itemIndex + ": ");
 			System.out.println("Name: " + item.Name + ", Price: $" + item.Price + "\n\tDescription: " + item.Description + "\n");
 			itemIndex++;
 		}
 		
-		System.out.println(itemIndex + ": Go back to search menu\n");
+		System.out.println(itemIndex + ": Go back to search menu\n"); //Final index is used to go back to previous menu
 		System.out.println("\nPlease select an item to add to your cart:\n");
 	}
-
+	
+	/**
+	*Starts up the user after the user logs in or creates a new account.
+	*/
 	public void startUser()
 	{
 		try
 		{
-			boolean runningUser = true;
+			boolean runningUser = true; //Makes sure the menu stays up until the user logs out
 			while (runningUser)
 			{
 				displayUserInterface();
@@ -132,17 +163,17 @@ public class Users {
 
 				switch (userChoice)
 				{
-					case 1: viewOrders(); //need to test
+					case 1: viewOrders(); //View the orders
 							break;
-					case 2: searchForItems(); //need to test
+					case 2: searchForItems(); //Search for items
 							break;
-					case 3: viewCart();	//need to test
+					case 3: viewCart();	//View current cart
 							break;
-					case 4: checkout(); //need to implement
+					case 4: checkout(); //Checkout item selection
 							break;
-					case 5:	removeItemFromCart(); // need to check
+					case 5:	removeItemFromCart(); //Remove an item from the cart
 							break;
-					case 6:	System.out.println("Logging Out...");
+					case 6:	System.out.println("Logging Out..."); //Will log the user out and return to login menu
 							runningUser = false;
 							break;
 					default:System.out.println("Not a valid option");
@@ -164,11 +195,12 @@ public class Users {
 	{
 		try
 		{
-			viewOrdersPreparedStatement.setInt(1, uID);
+			//Uses the prepared statement to bring back the user's orders based on their user ID.
+			viewOrdersPreparedStatement.setInt(1, uID); 
 			ResultSet rs = viewOrdersPreparedStatement.executeQuery();
 
-			int orderNumber = 0;
-			boolean firstOrder = false;
+			int orderNumber = 0; //Used to present the orders
+			boolean firstOrder = false; //Set to false to see if users
                         
 			while(rs.next())
 			{
