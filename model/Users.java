@@ -20,6 +20,7 @@ public class Users {
 	PreparedStatement decrementStockPreparedStatement;
 	PreparedStatement searchByCategory;
 	PreparedStatement searchAllItems;
+        PreparedStatement searchSpecificItem;
 	List<Item> cart;
 
 	public Users(Connection c, Statement s, int uID, String Name, String Email, long CreditCard, String Address, String Password)
@@ -34,13 +35,14 @@ public class Users {
 			this.Password = Password;
 			in = new Scanner(System.in);
 			cart = new ArrayList<Item>();
-
-			//All Prepared Statements
-			viewOrdersPreparedStatement = (PreparedStatement) c.prepareStatement("Select * from orders where uID = ?;");
+			
+			//All prepared statements
+			viewOrdersPreparedStatement = (PreparedStatement) c.prepareStatement("CALL getItemsOrdered(?);");
 			createOrderPreparedStatement = (PreparedStatement) c.prepareStatement("Insert into orders(items,uID) values (?,?);");
 			decrementStockPreparedStatement = (PreparedStatement) c.prepareStatement("CALL decrementStock(?);");
 			searchByCategory = (PreparedStatement) c.prepareStatement("Select * from items where Category = ? and stock <> 0 Order by Price asc;");
 			searchAllItems = (PreparedStatement) c.prepareStatement("Select * from items where stock <> 0 Order by Price asc;");
+                        searchSpecificItem = (PreparedStatement) c.prepareStatement("CALL getItem(?);");
 		}
 		catch(Exception e)
 		{
