@@ -7,8 +7,11 @@ import java.sql.*;
 public class Admin 
 {
 	Scanner in;
+	Scanner ini;
 	Connection connection;
 	PreparedStatement addItemPreparedStatement;
+	PreparedStatement deleteItemPreparedStatement;
+	PreparedStatement updateItemPreparedStatement;
 	Statement statement;
 	
 	public Admin(Connection c, Statement s)
@@ -19,6 +22,8 @@ public class Admin
 			connection = c;
 			statement = s;
 			addItemPreparedStatement = (PreparedStatement) connection.prepareStatement("INSERT into Items(Name, Price, Description, Category, Stock) values (?, ?, ?, ?, ?);");
+			deleteItemPreparedStatement = (PreparedStatement) connection.prepareStatement("Delete from Items where iID = ?;");
+			updateItemPreparedStatement = (PreparedStatement) connection.prepareStatement("Update Items set Name = ?, Price = ?, Description = ?, Category = ?, Stock = ? where iID = ?");
 		}
 		catch (Exception e)
 		{
@@ -53,9 +58,9 @@ public class Admin
 			   	{
 			   		case 1: addItem();
 			   				break;
-			   		case 2: //need to implement RISHABH START HERE
+			   		case 2: deleteItem();
 			   				break;
-			   		case 3: //need to implement RISHABH START HERE
+			   		case 3: updateItem();
 			   				break;
 			   		case 4: System.out.println("Logging Out...");
 			   				adminLogged = false;
@@ -83,15 +88,23 @@ public class Admin
 	  System.out.println("=======================");
 	}
 	
+	//Below are the functions for the Admin: Add, Update, Delete, Update
+	//????????????????????????????????Work on the error catching! What if there is wrong input by the user
+	
+	//Add item
 	public void addItem()
 	{
 		try
 		{
+			//asking for info regarding the item to be added
+			
 			System.out.println("Please enter the name of the item: ");
 			String name = in.nextLine();
-				
+
+			
 			System.out.println("Please enter the price of the item: ");
-			int price  = in.nextInt();
+			int price  = ini.nextInt();
+			
 			
 			System.out.println("Please enter the description of the item: ");
 			String description = in.nextLine();
@@ -101,7 +114,8 @@ public class Admin
 				
 			System.out.println("Please enter the quantity of the item: ");
 			int stock = in.nextInt();
-				       	            		
+			
+			//helper method
 			adminAddItem(name, price, description, category, stock);
 		}
 		catch(Exception e)
@@ -110,23 +124,111 @@ public class Admin
 		}
 	}
 	
-	public void adminAddItem(String name, int price, String description, String category, int stock) throws SQLException
+	//Add item helper method
+	public int adminAddItem(String name, int price, String description, String category, int stock) throws SQLException
 	{
+		int result = 0;
 	    try 
 	    {
+	    	//using the info of the item and executing the sql statement to update the database
 	    	addItemPreparedStatement.setString(1, name);
 	    	addItemPreparedStatement.setInt(2, price);
 	    	addItemPreparedStatement.setString(3, description);
 	    	addItemPreparedStatement.setString(4, category);
 	    	addItemPreparedStatement.setInt(5, stock);
-	    	addItemPreparedStatement.executeUpdate();
+	    	addItemPreparedStatement.execute();
+	    	result = addItemPreparedStatement.executeUpdate();
 	    }
 	    catch (SQLException e) 
 	    {
 	      e.printStackTrace();
-	    } 
+	    }
+	    finally
+	    {
+	    	addItemPreparedStatement.close();
+	    }
+	    return result;
 
 	  }
-	  
-}
 	
+	//Delete item
+	public void deleteItem() throws SQLException
+	{
+		//asking for info regarding the item to be updated
+		System.out.println("Please enter the ID of the item to be deleted: ");
+		int id = ini.nextInt();
+		
+		
+		adminDeleteItem(id);
+	}
+	
+	//Delete item helper method
+	public void adminDeleteItem(int id) throws SQLException
+	{
+		try
+		{
+	    	//using the info of the item and executing the sql statement to update the database
+			deleteItemPreparedStatement.setInt(1, id);		
+			deleteItemPreparedStatement.executeUpdate();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+	
+	//update item
+	public void updateItem()
+	{
+		//asking for info regarding the item to be deleted
+		
+		System.out.println("Please enter the ID of the item to be updated: ");
+		int id = ini.nextInt();
+		
+		System.out.println("Please enter the new Name of the item: ");
+		String name = in.nextLine();
+		
+		System.out.println("Please enter the new Price of the item: ");
+		int price = ini.nextInt();
+		
+		System.out.println("Please enter the new Description of the item: ");
+		String description = in.nextLine();
+		
+		System.out.println("Please enter the new Categories of the item: ");
+		String category = in.nextLine();
+		
+		System.out.println("Please enter the new Stock for the item: ");
+		int stock = ini.nextInt();
+		
+		adminUpdateItem(name, price, description, category, stock, id);
+	}
+	
+	//Update item helper method
+	public void adminUpdateItem(String name, int price, String description, String category, int stock, int id)
+	{
+    	//using the info of the item and executing the sql statement to update the database
+		
+		try
+		{
+			updateItemPreparedStatement.setString(1, name);
+			updateItemPreparedStatement.setInt(2, price);
+			updateItemPreparedStatement.setString(3, description);
+			updateItemPreparedStatement.setString(4, category);
+			updateItemPreparedStatement.setInt(5, stock);
+			updateItemPreparedStatement.setInt(6, id);
+			updateItemPreparedStatement.executeUpdate();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+	
+	//Logs the Admin out of the system
+	public void logout()
+	{
+		
+	}
+}
