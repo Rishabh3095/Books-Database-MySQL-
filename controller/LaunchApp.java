@@ -92,12 +92,49 @@ public class LaunchApp {
 	  return null; //remove after implementing returning a Users object
   }
   
-  public Users signUp(String name, String email, String cc, String add, String pass)
+  public Users signUp()
   {
+	  String name = "", email = "", cc = "", add = "", pass = "";
+	  Scanner in  = new Scanner(System.in);
+	  
+	  //sign up for the user
+	  while(name.equals("")) {
+		  System.out.println("Please Enter Your Name: ");
+	  	  name = in.nextLine().trim();
+	  	  if (name.equals(""))
+	  		  System.out.println("cannot be empty ");
+	  }
+		  
+	  while(email.equals("")) {
+		  System.out.println("Please Enter Your Email: ");
+		  email = in.nextLine().trim();
+		  if (email.equals(""))
+		  	  System.out.println("cannot be empty ");
+	  }
+	  
+	  while(cc.equals("")) {
+		  System.out.println("Please Enter Your CreditCard: ");
+		  cc = in.nextLine().trim();
+		  if (cc.equals(""))
+		  	  System.out.println("cannot be empty ");
+	  }
+
+	  while(add.equals("")) {
+		  System.out.println("Please Enter Your Address: ");
+		  add = in.nextLine().trim();
+		  if (add.equals(""))
+		  	  System.out.println("cannot be empty ");
+	  }
+		
+	  while(pass.equals("")) {
+		  System.out.println("Please Enter Your Password: ");
+		  pass = in.nextLine().trim();
+		  if (pass.equals(""))
+		      System.out.println("cannot be empty ");
+	  }
+	  
 	  try 
 	  {
-		  
-		  
 		  signUpPreparedStatement.setString(1, name);
 		  signUpPreparedStatement.setString(2, email);
 		  signUpPreparedStatement.setString(3, cc);
@@ -106,6 +143,7 @@ public class LaunchApp {
 		  signUpPreparedStatement.executeUpdate();
 		  ResultSet rs = statement.executeQuery("Select * from users;");// where name = \" " + name + " \" and password = \" " + pass + "\" ;" );
 		  System.out.println(rs);
+		  
 		  while (rs.next())
 		  {
 			  System.out.println(rs);
@@ -152,19 +190,28 @@ public class LaunchApp {
     
     while (appRunning) 
     {
-    	System.out.println("Please select a number for the corresponding option or enter q to quit:");
+		app.in  = new Scanner(System.in);
+		System.out.println("Please select a number for the corresponding option or enter q to quit:");
     	app.loginOrSignUp();
 
     	int selection = 0; //initialize selection to prevent null pointer exception
-    	String option = app.in.nextLine().trim();
+		String option;
+    	
+    	option = app.in.nextLine().trim();
 
     	if (option.toLowerCase().equals("q")) 
     	{
     		System.out.println("Thank you!");
     		appRunning = false;
+    		continue;
     	}
-  
-       selection = Integer.parseInt(option); 
+    	
+    	try {
+    		selection = Integer.parseInt(option); 
+    	} catch (Exception e) {
+    		System.out.println("Wrong Selection");
+    		continue;
+    	}
        
        	//Login Option
         if (selection == 1) 
@@ -172,9 +219,10 @@ public class LaunchApp {
         	//Login UI
         	Users user = app.login();
         	
-        	
-        	
-        	
+        	if (user == null) {
+        		System.out.println("\nUser with those credentials doesn't exist, please try again\n");
+        		continue;
+        	}
         	
         	
         	if (app.isAdmin == true)
@@ -182,7 +230,7 @@ public class LaunchApp {
         		Admin admin = new Admin(app.connection, app.statement);
         		admin.startAdmin();
         	}
-        	else
+        	else if (user == null)
         	{
         		//Display all user stuff
         		user.startUser();
@@ -190,23 +238,7 @@ public class LaunchApp {
         }
         else if (selection == 2)
         {
-        	//sign up for the user
-        	System.out.println("Please Enter Your Name: ");
-        	String name = app.in.nextLine().trim();
-        	
-        	System.out.println("Please Enter Your Email: ");
-        	String email = app.in.nextLine().trim();
-        	
-        	System.out.println("Please Enter Your CreditCard: ");
-        	String cc = app.in.nextLine().trim();
-     
-        	System.out.println("Please Enter Your Address: ");
-        	String add = app.in.nextLine().trim();
-        	
-        	System.out.println("Please Enter Your Password: ");
-        	String pass = app.in.nextLine().trim();
-        	
-			Users user = app.signUp(name, email, cc, add, pass);     
+        	Users user = app.signUp();     
 			
 			if (user != null)
 			{
@@ -217,7 +249,6 @@ public class LaunchApp {
         {
         	System.out.println("Invalid Option.");
         }
-      		 
     }
      
   }
