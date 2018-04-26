@@ -155,7 +155,9 @@ public class Users {
 			System.out.println("There was an error while running the user: " + e);
 		}
 	}
-
+	/**
+	*Allows the user to view the orders previously made.
+	*/
 	public void viewOrders()
 	{
 		try
@@ -165,15 +167,28 @@ public class Users {
 
 			int orderNumber = 0;
 			boolean firstOrder = false;
+                        
 			while(rs.next())
 			{
-				if (!firstOrder)
+			double orderTotal = 0.00;	
+                        if (!firstOrder)
 				{
-					System.out.println("Previous orders you purchased: ");
+					System.out.println("Previous orders " + rs.getString(2) +  " purchased: ");
 					firstOrder = true;
 				}
 				orderNumber++;
-				System.out.println("Order Number " + orderNumber + ": " + rs.getString(2));
+                                System.out.println("Order Number " + orderNumber + ": ");
+                                String[] items = rs.getString(1).split(",");
+                                for (int i = 0; i < items.length; i++){
+                                    int itemID = Integer.parseInt(items[i]);
+                                    searchSpecificItem.setInt(1, itemID);
+                                    ResultSet itemRS = searchSpecificItem.executeQuery();
+                                    itemRS.next();
+                                    System.out.println("\t" + Integer.toString(i+1) + ". " + itemRS.getString(2) + ": $" + itemRS.getDouble(3));
+                                    orderTotal += itemRS.getDouble(3);
+                                }
+                                System.out.println("\tTOTAL: $" + Math.round(orderTotal*100.0)/100.0);
+				
 			}
 			if (!firstOrder)
 			{
@@ -382,16 +397,18 @@ public class Users {
 	
 	public void viewCart()
 	{
+                double cartTotal = 0.0;
 		for (int i = 0; i < cart.size(); i++)
 		{
 			Item currentItem = cart.get(i);
-			System.out.print("Name: " + currentItem.Name + ", Price: $" + currentItem.Price);
+			System.out.println("Name: " + currentItem.Name + ", Price: $" + currentItem.Price);
+                        cartTotal += currentItem.Price;
 		}
+                System.out.println("TOTAL: $" + Math.round(cartTotal*100.0)/100.0);
 	}
 
 	public void checkout()
 	{
-		//MICHAEL STARTS HERE
 		try
 		{
 			if (cart.isEmpty())
