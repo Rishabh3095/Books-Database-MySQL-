@@ -57,7 +57,17 @@ public class Users {
 	      System.out.println("|5. Remove Item from List	|");
 	      System.out.println("|6. Logout				|");
 	      System.out.println("=======================");
-	  }
+	 }
+	 
+	 public void displaySearchInterface()
+	 {
+		  System.out.println("Please select an option from the menu:");
+		  System.out.println("=======================");
+	      System.out.println("|1. Search by Category	|");
+	      System.out.println("|2. Search All Items		|");
+	      System.out.println("|3. Go Back				|");
+	      System.out.println("=======================");
+	 }
 	 
 	 public void startUser()
 	 {
@@ -145,12 +155,54 @@ public class Users {
 		 //ZAHRA STARTS HERE
 		 try
 		 {
-			 
+			 boolean runningSearch = true;
+			 while (runningSearch)
+			 {
+				displaySearchInterface();
+				String choice = in.nextLine().trim();
+				int userChoice;
+				//parsing user input //handling invalid input format exception
+				try 
+				{
+			        userChoice = Integer.parseInt(choice);
+			    } 
+				catch (NumberFormatException e) 
+				{
+			        System.out.println("Invalid option! Please select a valid option!");
+			        continue;
+			    }
+				
+				switch (userChoice)
+				{
+					case 1: searchByCategory(); //need to implement
+							break;
+					case 2: searchAllItems(); //need to implement
+							break;
+					case 3:	System.out.println("Back to main menu...");	// need to implement
+	        				runningSearch = false;
+	        				break;
+	        		default:System.out.println("Not a valid option");
+	        				break;
+							
+				}
+					
+			 }
 		 }
 		 catch(Exception e)
 		 {
 			 System.out.println("Error in searching for items: " + e);
 		 }
+	 }
+	 
+	 public void searchByCategory()
+	 {
+		 System.out.println("searcg by category");
+	 }
+	 
+	 public void searchAllItems()
+	 {
+		 System.out.println("searcg by item");
+
 	 }
 	 
 	 public void viewCart()
@@ -185,6 +237,7 @@ public class Users {
                          createOrderPreparedStatement.executeUpdate();
                          cart.clear();
                          System.out.println("Order had been placed!");
+                    	}
 		 }
 		 catch (Exception e)
 		 {
