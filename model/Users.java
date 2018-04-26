@@ -87,6 +87,12 @@ public class Users {
 		System.out.println("=======================");
 	}
 	
+	/**
+	 * Displays items for users to select from
+	 * Helper method for searchForItems
+	 *
+	 * @param items - list of items to be displayed
+	 */
 	public void displayItems(ArrayList<Item> items) {
 		int itemIndex = 1;
 		System.out.println("Products:\n");
@@ -182,6 +188,9 @@ public class Users {
 
 	}
 
+	/**
+	 * Allows user to search items by category or items
+	 */
 	public void searchForItems()
 	{
 		//ZAHRA STARTS HERE
@@ -193,7 +202,7 @@ public class Users {
 				displaySearchInterface();
 				String choice = in.nextLine().trim();
 				int userChoice;
-				//parsing user input //handling invalid input format exception
+
 				try 
 				{
 					userChoice = Integer.parseInt(choice);
@@ -206,9 +215,9 @@ public class Users {
 
 				switch (userChoice)
 				{
-					case 1: searchByCategory(); //need to implement
+					case 1: searchByCategory();
 							break;
-					case 2: searchAllItems(); //need to implement
+					case 2: searchAllItems();
 							break;
 					case 3:	System.out.println("Back to main menu...");
 							runningSearch = false;
@@ -225,6 +234,10 @@ public class Users {
 		}
 	}
 
+	/**
+	 * Allows user to view items from specific category
+	 * Helper method for searchForItems
+	 */
 	public void searchByCategory()
 	{
 		try {
@@ -284,6 +297,28 @@ public class Users {
 	}
 	
 	
+	/**
+	 * Allows user to view all items
+	 * Helper method for searchForItems
+	 */
+	public void searchAllItems()
+	{
+		try {
+			ResultSet rs;
+			rs = searchAllItems.executeQuery();
+			selectItem(rs);
+		} catch (Exception e) {
+			System.out.println("Error searching all items " + e);
+		}
+	}
+	
+	
+	/**
+	 * Implements selection of item to add to cart
+	 * Helper method for searchForItems
+	 *
+	 * @param rs Result Set of items that user can select from
+	 */
 	public void selectItem(ResultSet rs)
 	{
 		try
@@ -344,17 +379,6 @@ public class Users {
 
 	}
 	
-	public void searchAllItems()
-	{
-		try {
-			ResultSet rs;
-			rs = searchAllItems.executeQuery();
-			selectItem(rs);
-		} catch (Exception e) {
-			System.out.println("Error searching all items " + e);
-		}
-	}
-
 	
 	public void viewCart()
 	{
