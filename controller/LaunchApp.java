@@ -46,13 +46,21 @@ public class LaunchApp {
   public Users login()
   {
 	  Scanner in = new Scanner(System.in);
+	  String username = "", pass = "";
 	  
-	  System.out.print("Please enter the email: ");
-	  String username = in.nextLine();
+	  while (username.equals("")) {
+		  System.out.println("Please enter the email: ");
+		  username = in.nextLine().trim();
+		  if (username.equals(""))
+			  System.out.println("cannot be empty ");
+	  }
 	  
-	  System.out.print("Please enter the password: ");
-	  String pass = in.nextLine();
-	  
+	  while (username.equals("")) {
+		  System.out.println("Please enter the password: ");
+		  pass = in.nextLine().trim();
+		  if (username.equals(""))
+			  System.out.println("cannot be empty ");
+	  }
 	  
 	  //DHRUV STARTS HERE
 	  try
@@ -229,11 +237,6 @@ public class LaunchApp {
         	{
         		Admin admin = new Admin(app.connection, app.statement);
         		admin.startAdmin();
-        	}
-        	else if (user == null)
-        	{
-        		//Display all user stuff
-        		user.startUser();
         	}
         }
         else if (selection == 2)
