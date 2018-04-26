@@ -92,12 +92,12 @@ public class Admin
 	{
 	  System.out.println("Please select an option from the menu:");
 	  System.out.println("=======================");
-	  System.out.println("|1. Add Item			|");
-	  System.out.println("|2. Delete Item		|");
-	  System.out.println("|3. Update Item		|");
-	  System.out.println("|4. View All Orders	|");
-	  System.out.println("|5. Total Admins   	|");
-	  System.out.println("|6. Logout			|");
+	  System.out.println("|1. Add Item			");
+	  System.out.println("|2. Delete Item		");
+	  System.out.println("|3. Update Item		");
+	  System.out.println("|4. View All Orders	");
+	  System.out.println("|5. Total Admins   	");
+	  System.out.println("|6. Logout			");
 	  System.out.println("=======================");
 	}
 	

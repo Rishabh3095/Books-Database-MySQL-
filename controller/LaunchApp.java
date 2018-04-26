@@ -82,7 +82,6 @@ public class LaunchApp {
 			  {
 				  String a = rs.getString(4);
 				  Long b = Long.parseLong(a);
-				  System.out.println(b);
 				  return new Users(connection, statement,rs.getInt(1), rs.getString(2), rs.getString(3), b, rs.getString(5), rs.getString(6)); 
 			  }
 		  }
@@ -176,8 +175,8 @@ public class LaunchApp {
   public void loginOrSignUp(){
 	  System.out.println("Please select an option from the menu:");
 	  System.out.println("=======================");
-      System.out.println("|1. Login|");
-      System.out.println("|2. Sign Up|");
+      System.out.println("|1. Login");
+      System.out.println("|2. Sign Up");
       System.out.println("=======================");
   }
 

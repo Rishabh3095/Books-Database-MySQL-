@@ -59,8 +59,8 @@ public class Users {
 			viewOrdersPreparedStatement = (PreparedStatement) c.prepareStatement("CALL getItemsOrdered(?);"); //Used to view the orders
 			createOrderPreparedStatement = (PreparedStatement) c.prepareStatement("Insert into orders(items,uID) values (?,?);"); //Used to create the order
 			decrementStockPreparedStatement = (PreparedStatement) c.prepareStatement("CALL decrementStock(?);"); //Used to remove an item from the stock
-			searchByCategory = (PreparedStatement) c.prepareStatement("Select * from PriceLowToHigh;"); //Used to select items based on the category
-			searchAllItems = (PreparedStatement) c.prepareStatement("Select * from items where stock <> 0 Order by Price asc;"); //Used to select all available items
+			searchByCategory = (PreparedStatement) c.prepareStatement("Select * from items where Category = ? and stock <> 0 Order by Price asc;"); //Used to select items based on the category
+			searchAllItems = (PreparedStatement) c.prepareStatement("Select * from PriceLowToHigh;"); //Used to select all available items
                         searchSpecificItem = (PreparedStatement) c.prepareStatement("CALL getItem(?);"); //Used to find a specific item based on the item ID
 		}
 		catch(Exception e)
@@ -78,12 +78,12 @@ public class Users {
 		System.out.println();
 		System.out.println("Please select an option from the menu:");
 		System.out.println("=======================");
-		System.out.println("|1. View Orders			|");
-		System.out.println("|2. Search for Item		|");
-		System.out.println("|3. View Cart				|");
-		System.out.println("|4. Checkout				|");
-		System.out.println("|5. Remove Item from List	|");
-		System.out.println("|6. Logout				|");
+		System.out.println("|1. View Orders			");
+		System.out.println("|2. Search for Item		");
+		System.out.println("|3. View Cart				");
+		System.out.println("|4. Checkout				");
+		System.out.println("|5. Remove Item from List	");
+		System.out.println("|6. Logout				");
 		System.out.println("=======================");
 	}
 	/**
@@ -94,9 +94,9 @@ public class Users {
 		System.out.println();
 		System.out.println("Please select an option from the menu:");
 		System.out.println("=======================");
-		System.out.println("|1. Search by Category	|");
-		System.out.println("|2. Search All Items		|");
-		System.out.println("|3. Go Back				|");
+		System.out.println("|1. Search by Category	");
+		System.out.println("|2. Search All Items		");
+		System.out.println("|3. Go Back				");
 		System.out.println("=======================");
 	}
 	
@@ -108,11 +108,11 @@ public class Users {
 		System.out.println();
 		System.out.println("Please select which category to view items from:");
 		System.out.println("=======================");
-		System.out.println("|1. Beauty and Health			|");
-		System.out.println("|2. Clothing and Accessories	|");
-		System.out.println("|3. Electtronics				|");
-		System.out.println("|4. Sports					|");
-		System.out.println("|5. Go Back to Search Options |");
+		System.out.println("|1. Beauty and Health			");
+		System.out.println("|2. Clothing and Accessories	");
+		System.out.println("|3. Electtronics				");
+		System.out.println("|4. Sports					");
+		System.out.println("|5. Go Back to Search Options ");
 		System.out.println("=======================");
 	}
 	
@@ -333,6 +333,7 @@ public class Users {
 				}
 				
 				if(continueSearch) {
+					searchByCategory.setString(1, category);
 					ResultSet rs = searchByCategory.executeQuery();
 					selectItem(rs);
 				}
@@ -402,21 +403,26 @@ public class Users {
 					runningSearch = false;
 				else
 				{
-					Item addToCart = items.get(userChoice - 1);
-					int cartCount = 0;
-					
-					for(Item cartItem : cart) {
-						if(cartItem.Name == addToCart.Name)
-							cartCount++;
-					}
-					
-					if(addToCart.Stock > cartCount) {
-						cart.add(addToCart);
-						System.out.println("This item has been added to your cart.\n\n");
-					}
-					else
-						System.out.println("This item is out of stock. Please select a different item. ");
+					try {
+						Item addToCart = items.get(userChoice - 1);
+						int cartCount = 0;
 						
+						for(Item cartItem : cart) {
+							if(cartItem.Name == addToCart.Name)
+								cartCount++;
+						}
+						
+						if(addToCart.Stock > cartCount) {
+							cart.add(addToCart);
+							System.out.println("This item has been added to your cart.\n\n");
+						}
+						else
+							System.out.println("This item is out of stock. Please select a different item. ");		
+					}
+					catch (Exception q)
+					{
+						System.out.println("Please select an item that exists in the menu above. Thank you!");
+					}
 				}
 
 			}
