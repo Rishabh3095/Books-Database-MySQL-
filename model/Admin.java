@@ -12,6 +12,7 @@ public class Admin
 	PreparedStatement addItemPreparedStatement;
 	PreparedStatement deleteItemPreparedStatement;
 	PreparedStatement updateItemPreparedStatement;
+	PreparedStatement maxAdminPreparedStatement;
 	PreparedStatement viewAllUserOrders;
 
 	Statement statement;
@@ -27,6 +28,7 @@ public class Admin
 			deleteItemPreparedStatement = (PreparedStatement) connection.prepareStatement("Delete from Items where iID = ?;");
 			updateItemPreparedStatement = (PreparedStatement) connection.prepareStatement("Update Items set Name = ?, Price = ?, Description = ?, Category = ?, Stock = ? where iID = ?");
 			viewAllUserOrders = (PreparedStatement) connection.prepareStatement("select items from orders where uID = (select uID from users where uID = ?)");
+			maxAdminPreparedStatement = (PreparedStatement) connection.prepareStatement("select Count(*) from users where admin = 1;");
 
 		}
 		catch (Exception e)
@@ -69,7 +71,9 @@ public class Admin
 			   				break;
 			   		case 4: viewAllOrders();
 			   				break;
-			   		case 5: System.out.println("Logging Out...");
+			   		case 5: maxAdmins();
+			   				break;
+			   		case 6: System.out.println("Logging Out...");
 			   				adminLogged = false;
 			   				break;
 			   		default: System.out.println("Not a valid option");
@@ -92,12 +96,18 @@ public class Admin
 	  System.out.println("|2. Delete Item		|");
 	  System.out.println("|3. Update Item		|");
 	  System.out.println("|4. View All Orders	|");
-	  System.out.println("|5. Logout			|");
+	  System.out.println("|5. Total Admins   	|");
+	  System.out.println("|6. Logout			|");
 	  System.out.println("=======================");
 	}
 	
 	//Below are the functions for the Admin: Add, Update, Delete, Update
 	//????????????????????????????????Work on the error catching! What if there is wrong input by the user
+	
+	public void maxAdmins() throws SQLException
+	{
+		maxAdminPreparedStatement.execute();
+	}
 	
 	//Add item
 	public void addItem()
