@@ -55,10 +55,10 @@ public class LaunchApp {
 			  System.out.println("cannot be empty ");
 	  }
 	  
-	  while (username.equals("")) {
+	  while (pass.equals("")) {
 		  System.out.println("Please enter the password: ");
 		  pass = in.nextLine().trim();
-		  if (username.equals(""))
+		  if (pass.equals(""))
 			  System.out.println("cannot be empty ");
 	  }
 	  
@@ -227,17 +227,19 @@ public class LaunchApp {
         	//Login UI
         	Users user = app.login();
         	
-        	if (user == null) {
-        		System.out.println("\nUser with those credentials doesn't exist, please try again\n");
-        		continue;
-        	}
-        	
         	
         	if (app.isAdmin == true)
         	{
         		Admin admin = new Admin(app.connection, app.statement);
         		admin.startAdmin();
+        	} else if (user == null) {
+        		System.out.println("\nUser with those credentials doesn't exist, please try again\n");
+        		continue;
+        	} else {
+        		user.startUser();
         	}
+        	
+        	
         }
         else if (selection == 2)
         {
