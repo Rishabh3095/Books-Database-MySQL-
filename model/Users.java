@@ -520,24 +520,46 @@ public class Users {
 		{
 			try
 			{
-				System.out.println("Please select a number to remove:");
-				
-				//Loops through the cart to get each item in there and assign it a number the user will user to delete it
-				for (int i = 0; i < cart.size(); i++)
+				if(cart.isEmpty())
 				{
-					Item item = cart.get(i);
-					System.out.println((i+1) + " ) " + item.Name);
-				}
-				int removeNumber = in.nextInt(); //The number of the item that will be removed
-				try
-				{
-					//Remove the item from the cart and end the loop
-					cart.remove((removeNumber-1));
+					System.out.println("Nothing in the cart");
 					validItem = true;
 				}
-				catch(Exception e)
+				else
 				{
-					System.out.println("Please choose a valid number");
+//					viewCart();
+					
+					System.out.println("Please press 'q' to exit: ");
+					System.out.println("Please select a number to remove:");
+					
+					//Loops through the cart to get each item in there and assign it a number the user will user to delete it
+					for (int i = 0; i < cart.size(); i++)
+					{
+						Item item = cart.get(i);
+						System.out.println((i+1) + " ) " + item.Name);
+					}
+					
+					String removeNumb = in.nextLine(); //The number of the item that will be removed
+					int removeNumber;
+					try {
+						removeNumber = Integer.parseInt(removeNumb);						
+					}
+					catch (Exception e)
+					{
+						System.out.println("Please enter a valid input!");
+						continue;
+					}
+					
+					try
+					{
+						//Remove the item from the cart and end the loop
+						cart.remove((removeNumber-1));
+						validItem = true;
+					}
+					catch(Exception e)
+					{
+						System.out.println("Please choose a valid number");
+					}
 				}
 			}
 			catch(Exception e)
