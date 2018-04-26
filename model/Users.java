@@ -59,7 +59,7 @@ public class Users {
 			viewOrdersPreparedStatement = (PreparedStatement) c.prepareStatement("CALL getItemsOrdered(?);"); //Used to view the orders
 			createOrderPreparedStatement = (PreparedStatement) c.prepareStatement("Insert into orders(items,uID) values (?,?);"); //Used to create the order
 			decrementStockPreparedStatement = (PreparedStatement) c.prepareStatement("CALL decrementStock(?);"); //Used to remove an item from the stock
-			searchByCategory = (PreparedStatement) c.prepareStatement("Select * from items where Category = ? and stock <> 0 Order by Price asc;"); //Used to select items based on the category
+			searchByCategory = (PreparedStatement) c.prepareStatement("Select * from PriceLowToHigh;"); //Used to select items based on the category
 			searchAllItems = (PreparedStatement) c.prepareStatement("Select * from items where stock <> 0 Order by Price asc;"); //Used to select all available items
                         searchSpecificItem = (PreparedStatement) c.prepareStatement("CALL getItem(?);"); //Used to find a specific item based on the item ID
 		}
@@ -333,7 +333,6 @@ public class Users {
 				}
 				
 				if(continueSearch) {
-					searchByCategory.setString(1, category);
 					ResultSet rs = searchByCategory.executeQuery();
 					selectItem(rs);
 				}
