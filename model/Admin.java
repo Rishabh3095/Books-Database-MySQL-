@@ -1,5 +1,4 @@
 package model;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -15,7 +14,6 @@ public class Admin
 	PreparedStatement updateItemPreparedStatement; //updates an item in the items table
 	PreparedStatement numberOfUsersPreparedStatement; //gets the number of users 
 	PreparedStatement displayItemsInOrderStatement; //displays all the items in order
-	PreparedStatement viewAllUserOrders; //displays all the users orders
 	PreparedStatement deleteUser; //delete a user
 	PreparedStatement displayUsers; //display all the users
 	Statement statement; //sends the queries to the database
@@ -34,15 +32,13 @@ public class Admin
 			
 			//initialize all the prepared statements with the queries
 			addItemPreparedStatement = (PreparedStatement) connection.prepareStatement("INSERT into Items(Name, Price, Description, Category, Stock) values (?, ?, ?, ?, ?);");
-			deleteItemPreparedStatement = (PreparedStatement) connection.prepareStatement("Delete from Items where iID = ?;");
+			deleteItemPreparedStatement = (PreparedStatement) connection.prepareStatement("Delete from Items where iID in (select uID from users where iID = ?);");
 			updateItemPreparedStatement = (PreparedStatement) connection.prepareStatement("Update PriceLowToHigh set Name = ?, Price = ?, Description = ?, Category = ?, Stock = ? where iID = ?;");
-			viewAllUserOrders = (PreparedStatement) connection.prepareStatement("select items from orders where uID = (select uID from users where uID = ?)");
 			numberOfUsersPreparedStatement = (PreparedStatement) connection.prepareStatement("select Count(*) from users where admin = 0;");
 			displayItemsInOrderStatement = (PreparedStatement) connection.prepareStatement("select * from PriceLowToHigh");
 			displayUsers = (PreparedStatement) connection.prepareStatement("Select uID, Name, Email from Users where admin <> 1;");
 			deleteUser = (PreparedStatement) connection.prepareStatement("Delete from users where uID = ?;");
-
-		}
+		   }
 		catch (Exception e)
 		{
 			System.out.println("There was an error creating the Admin: " + e);
@@ -91,13 +87,11 @@ public class Admin
 			   				break;
 			   		case 3: updateItem(); //go to the update item function
 			   				break;
-			   		case 4: viewAllOrders(); //go to the view orders function
+			   		case 4: numberOfUsers(); //go to the get number of users function
 			   				break;
-			   		case 5: numberOfUsers(); //go to the get number of users function
+			   		case 5: deleteUser(); //go to the delete user function
 			   				break;
-			   		case 6: deleteUser(); //go to the delete user function
-			   				break;
-			   		case 7: System.out.println("Logging Out..."); //user logs out
+			   		case 6: System.out.println("Logging Out..."); //user logs out
 			   				adminLogged = false;
 			   				break;
 			   		default: System.out.println("Not a valid option"); //user gave an invalid option
@@ -122,10 +116,9 @@ public class Admin
 	  System.out.println("|1. Add Item			");
 	  System.out.println("|2. Delete Item		");
 	  System.out.println("|3. Update Item		");
-	  System.out.println("|4. View All Orders	");
-	  System.out.println("|5. Total # of Users  ");
-	  System.out.println("|6. Remove a User		");
-	  System.out.println("|7. Logout			");
+	  System.out.println("|4. Total # of Users  ");
+	  System.out.println("|5. Remove a User		");
+	  System.out.println("|6. Logout			");
 	  System.out.println("=======================");
 	}
 	
@@ -351,29 +344,6 @@ public class Admin
 
 	}
 
-	/*
-	 * View all the orders from a user
-	 */
-	public void viewAllOrders()
-	{
-		try
-		{
-			//Create a new scanner object
-			Scanner ini = new Scanner(System.in);
-			
-			//get the information from the user
-			System.out.println("Please enter the ID of the user to view his orders: ");
-			
-			int id = ini.nextInt();
-			viewAllUserOrders.setInt(1, id);		
-			viewAllUserOrders.executeQuery();
-		}
-		catch(Exception e)
-		{
-			System.out.println("There was an error with displaying all items: " + e);
-		}
-		
-	}
 		
 	/*
 	 * update item in the items table
