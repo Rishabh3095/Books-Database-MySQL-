@@ -293,6 +293,7 @@ public class Admin
 	 */
 	public void deleteItem()
 	{
+		int id = 0;
 		try
 		{
 			//gets the response for displaying all the items
@@ -304,19 +305,30 @@ public class Admin
 			}
 			
 			//create a new scanner for input
-			Scanner ini = new Scanner(System.in);
 			
 			//get the id number of the item you want to delete
 			System.out.println("Please enter the ID of the item to be deleted: ");
-			int id = ini.nextInt();
 			
-			//go to helper method to delete the item
-			adminDeleteItem(id);
+			String idSrt = in.nextLine();
+			
+			try
+			{
+				id = Integer.parseInt(idSrt);
+			}
+			catch (Exception e)
+			{
+				System.out.println("Please enter a valid input!");
+			}
+		
+
 		}
 		catch(Exception e)
 		{
 			System.out.println("There was an error with deleting the item: " + e );
 		}
+		//go to helper method to delete the item
+		adminDeleteItem(id);
+		
 	}
 	
 	/*
