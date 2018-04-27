@@ -92,9 +92,6 @@ public class LaunchApp {
 	  {
 		  System.out.println("Error logging in" + e);
 	  }
-	  //return True is the user is an admin
-	  
-	  //return False if they are a normal user
 	 
 	  return null; //remove after implementing returning a Users object
   }

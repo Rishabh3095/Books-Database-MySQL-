@@ -16,8 +16,8 @@ public class Admin
 	PreparedStatement numberOfUsersPreparedStatement; //gets the number of users 
 	PreparedStatement displayItemsInOrderStatement; //displays all the items in order
 	PreparedStatement viewAllUserOrders; //displays all the users orders
-	PreparedStatement deleteUser;
-	PreparedStatement displayUsers;
+	PreparedStatement deleteUser; //delete a user
+	PreparedStatement displayUsers; //display all the users
 	Statement statement; //sends the queries to the database
 	
 	/*
@@ -39,7 +39,7 @@ public class Admin
 			viewAllUserOrders = (PreparedStatement) connection.prepareStatement("select items from orders where uID = (select uID from users where uID = ?)");
 			numberOfUsersPreparedStatement = (PreparedStatement) connection.prepareStatement("select Count(*) from users where admin = 0;");
 			displayItemsInOrderStatement = (PreparedStatement) connection.prepareStatement("select * from PriceLowToHigh");
-			displayUsers = (PreparedStatement) connection.prepareStatement("Select uID, Name, Email Users where admin <> 1;");
+			displayUsers = (PreparedStatement) connection.prepareStatement("Select uID, Name, Email from Users where admin <> 1;");
 			deleteUser = (PreparedStatement) connection.prepareStatement("Delete from users where uID = ?;");
 
 		}
@@ -129,6 +129,41 @@ public class Admin
 	  System.out.println("=======================");
 	}
 	
+	
+	/*
+	 * Display the categories for the shopping
+	 */
+	public String getCategory()
+	{
+		//list of all the options
+		String[] categories = {"Clothing and Accessories", "Beauty and Health", "Sports", "Electronics", "Clothing and Accessories"};
+		System.out.println("Select an option from the categories:");
+		while (true)
+		{
+			try
+			{
+				//display the options
+				for (int i = 0; i < categories.length; i++)
+				{
+					System.out.println((i+1) + ". " + categories[i]);
+				}
+				
+				//user can choose one of the options
+				Scanner in = new Scanner(System.in);
+				int choice = in.nextInt();
+				
+				//return the option the use chose
+				return categories[choice - 1];
+			}
+			catch(Exception e)
+			{
+				System.out.println("There was an error choosing the category. Select a valid option");
+				continue;
+			}
+		}
+		
+	}
+	
 	/*
 	 * Gets the number of Users in the Users table
 	 */
@@ -201,8 +236,7 @@ public class Admin
 			
 			while (category.trim().equals(""))
 			{
-				System.out.print("Please enter the category of the item: ");
-				category = in.nextLine();
+				category = getCategory();
 				if (category.trim().equals(""))
 				{
 					System.out.println("Please enter a valid category");
@@ -218,8 +252,11 @@ public class Admin
 					System.out.println("Please enter a valid number for the stock");
 				}
 			}
+			
 			//helper method for adding the item
 			adminAddItem(name, price, description, category, stock);
+			
+			System.out.println("Added Item!");
 		}
 		catch(Exception e)
 		{
@@ -332,7 +369,14 @@ public class Admin
 	public void updateItem()
 	{
 		try
-		{		
+		{	
+			int id = 0;
+			String name = "";
+			double price = 0;
+			String description = "";
+			String category = "";
+			int stock = 0;
+			
 			//get the response from the query
 			ResultSet rs = displayItemsInOrderStatement.executeQuery();
 			while(rs.next())
@@ -343,26 +387,59 @@ public class Admin
 			
 			//asking for info regarding the item to be deleted
 			Scanner ini = new Scanner(System.in);
-			System.out.println("Please enter the ID of the item to be updated: ");
-			int id = ini.nextInt();
 			
-			System.out.println("Please enter the new Name of the item: ");
-			String name = in.nextLine();
+			while (id <= 0)
+			{
+				System.out.print("Please enter the ID of the item to be updated: ");
+				id = ini.nextInt();
+				if (id <= 0)
+					System.out.println("Enter a valid ID");
+			}
 			
-			System.out.println("Please enter the new Price of the item: ");
-			int price = ini.nextInt();
+			while(name.trim().equals(""))
+			{
+				System.out.print("Please enter the new name of the item: ");
+				name = in.nextLine();
+				if (name.trim().equals(""))
+					System.out.println("Enter a valid name");
+			}
 			
-			System.out.println("Please enter the new Description of the item: ");
-			String description = in.nextLine();
 			
-			System.out.println("Please enter the new Categories of the item: ");
-			String category = in.nextLine();
+			while (price <= 0)
+			{
+				System.out.print("Please enter the new price of the item: \n$");
+				price = ini.nextDouble();
+				if (price <= 0)
+					System.out.println("Enter a valid price");
+			}
 			
-			System.out.println("Please enter the new Stock for the item: ");
-			int stock = ini.nextInt();
+			while (description.trim().equals(""))
+			{
+				System.out.print("Please enter the new description of the item: ");
+				description = in.nextLine();
+				if (description.trim().equals(""))
+					System.out.println("Enter a valid description");
+			}
+			
+			while(category.trim().equals(""))
+			{
+				category = getCategory();
+				if (category.trim().equals(""))
+					System.out.println("Enter a valid category");
+			}
+			
+			while (stock <= 0)
+			{
+				System.out.print("Please enter the new quantity for the item: ");
+				stock = ini.nextInt();
+				if (stock <= 0)
+					System.out.println("Enter a valid quantity number");
+			}
 			
 			//go into the helper method for adding the item
 			adminUpdateItem(name, price, description, category, stock, id);
+			
+			System.out.println("Updated Item!");
 		}
 		catch (Exception e)
 		{
@@ -409,14 +486,14 @@ public class Admin
 	/*
 	 * Update item helper method
 	 */
-	public void adminUpdateItem(String name, int price, String description, String category, int stock, int id)
+	public void adminUpdateItem(String name, double price, String description, String category, int stock, int id)
 	{
     	
 		try
 		{
 			//insert the information into the query
 			updateItemPreparedStatement.setString(1, name);
-			updateItemPreparedStatement.setInt(2, price);
+			updateItemPreparedStatement.setDouble(2, price);
 			updateItemPreparedStatement.setString(3, description);
 			updateItemPreparedStatement.setString(4, category);
 			updateItemPreparedStatement.setInt(5, stock);
