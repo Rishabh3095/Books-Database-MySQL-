@@ -24,7 +24,7 @@ public class Users {
 	PreparedStatement decrementStockPreparedStatement;
 	PreparedStatement searchByCategory;
 	PreparedStatement searchAllItems;
-        PreparedStatement searchSpecificItem;
+    PreparedStatement searchSpecificItem;
 	
 	//The items the user has selected to purchase
 	List<Item> cart;
@@ -46,6 +46,7 @@ public class Users {
 	{
 		try
 		{
+			//initialize all the variables
 			this.uID = uID;
 			this.Name = Name;
 			this.Email = Email;
@@ -55,13 +56,13 @@ public class Users {
 			in = new Scanner(System.in);
 			cart = new ArrayList<Item>();
 			
-			//All prepared statements
+			//initialize all prepared statements
 			viewOrdersPreparedStatement = (PreparedStatement) c.prepareStatement("CALL getItemsOrdered(?);"); //Used to view the orders
 			createOrderPreparedStatement = (PreparedStatement) c.prepareStatement("Insert into orders(items,uID) values (?,?);"); //Used to create the order
 			decrementStockPreparedStatement = (PreparedStatement) c.prepareStatement("CALL decrementStock(?);"); //Used to remove an item from the stock
 			searchByCategory = (PreparedStatement) c.prepareStatement("Select * from items where Category = ? and stock <> 0 Order by Price asc;"); //Used to select items based on the category
 			searchAllItems = (PreparedStatement) c.prepareStatement("Select * from PriceLowToHigh;"); //Used to select all available items
-                        searchSpecificItem = (PreparedStatement) c.prepareStatement("CALL getItem(?);"); //Used to find a specific item based on the item ID
+            searchSpecificItem = (PreparedStatement) c.prepareStatement("CALL getItem(?);"); //Used to find a specific item based on the item ID
 		}
 		catch(Exception e)
 		{
@@ -78,14 +79,15 @@ public class Users {
 		System.out.println();
 		System.out.println("Please select an option from the menu:");
 		System.out.println("=======================");
-		System.out.println("|1. View Orders			");
-		System.out.println("|2. Search for Item		");
-		System.out.println("|3. View Cart				");
-		System.out.println("|4. Checkout				");
-		System.out.println("|5. Remove Item from List	");
-		System.out.println("|6. Logout				");
+		System.out.println("1. View Orders			");
+		System.out.println("2. Search for Item		");
+		System.out.println("3. View Cart				");
+		System.out.println("4. Checkout				");
+		System.out.println("5. Remove Item from List	");
+		System.out.println("6. Logout				");
 		System.out.println("=======================");
 	}
+
 	/**
 	*Prints out the search interface
 	*/
@@ -94,9 +96,9 @@ public class Users {
 		System.out.println();
 		System.out.println("Please select an option from the menu:");
 		System.out.println("=======================");
-		System.out.println("|1. Search by Category	");
-		System.out.println("|2. Search All Items		");
-		System.out.println("|3. Go Back				");
+		System.out.println("1. Search by Category	");
+		System.out.println("2. Search All Items		");
+		System.out.println("3. Go Back				");
 		System.out.println("=======================");
 	}
 	
@@ -108,11 +110,11 @@ public class Users {
 		System.out.println();
 		System.out.println("Please select which category to view items from:");
 		System.out.println("=======================");
-		System.out.println("|1. Beauty and Health			");
-		System.out.println("|2. Clothing and Accessories	");
-		System.out.println("|3. Electtronics				");
-		System.out.println("|4. Sports					");
-		System.out.println("|5. Go Back to Search Options ");
+		System.out.println("1. Beauty and Health			");
+		System.out.println("2. Clothing and Accessories	");
+		System.out.println("3. Electronics				");
+		System.out.println("4. Sports					");
+		System.out.println("5. Go Back to Search Options ");
 		System.out.println("=======================");
 	}
 	
@@ -127,7 +129,8 @@ public class Users {
 		System.out.println("Products:\n");
 		
 		//Loops through the items the user asked to display (either by category or every item)
-		for(Item item : items) {
+		for(Item item : items) 
+		{
 			System.out.print(itemIndex + ": ");
 			System.out.println("Name: " + item.Name + ", Price: $" + item.Price + "\n\tDescription: " + item.Description + "\n");
 			itemIndex++;
@@ -147,10 +150,12 @@ public class Users {
 			boolean runningUser = true; //Makes sure the menu stays up until the user logs out
 			while (runningUser)
 			{
+				//get the user's choice
 				displayUserInterface();
 				String choice = in.nextLine().trim();
 				int userChoice;
-				//parsing user input //handling invalid input format exception
+				
+				//parses user input and handling invalid input format exception
 				try 
 				{
 					userChoice = Integer.parseInt(choice);
@@ -188,6 +193,7 @@ public class Users {
 			System.out.println("There was an error while running the user: " + e);
 		}
 	}
+
 	/**
 	*Allows the user to view the orders previously made.
 	*/
@@ -205,28 +211,30 @@ public class Users {
 			//Loops while the result set still has data in it
 			while(rs.next())
 			{
-			double orderTotal = 0.00; //The final total for the current order (initialized for each order)	
-                        if (!firstOrder)
+				double orderTotal = 0.00; //The final total for the current order (initialized for each order)	
+                if (!firstOrder)
 				{
 					System.out.println("Previous orders " + rs.getString(2) +  " purchased: ");
 					firstOrder = true; //Only need to do this step for the very first order
 				}
 				orderNumber++;
-                                System.out.println("Order Number " + orderNumber + ": ");
-                                String[] items = rs.getString(1).split(","); //Split the item numbers in order to look each up in the database
+                System.out.println("Order Number " + orderNumber + ": ");
+                String[] items = rs.getString(1).split(","); //Split the item numbers in order to look each up in the database
                                 
 				//Loops through all the items in the order
-				for (int i = 0; i < items.length; i++){
-                                    int itemID = Integer.parseInt(items[i]); //Convert the item number into an integer datatype
-					//Look for the item in the database by the item number
-                                    searchSpecificItem.setInt(1, itemID);
-                                    ResultSet itemRS = searchSpecificItem.executeQuery();
-                                    itemRS.next();
+				for (int i = 0; i < items.length; i++)
+				{
+					int itemID = Integer.parseInt(items[i]); //Convert the item number into an integer datatype
 					
-                                    System.out.println("\t" + Integer.toString(i+1) + ". " + itemRS.getString(2) + ": $" + itemRS.getDouble(3));
-                                    orderTotal += itemRS.getDouble(3); //Add the price to the item number
-                                }
-                                System.out.println("\tTOTAL: $" + Math.round(orderTotal*100.0)/100.0); //Math.round used to ensure the correct number of decimal digits
+					//Look for the item in the database by the item number
+					searchSpecificItem.setInt(1, itemID);
+					ResultSet itemRS = searchSpecificItem.executeQuery();
+					itemRS.next();
+					
+					System.out.println("\t" + Integer.toString(i+1) + ". " + itemRS.getString(2) + ": $" + itemRS.getDouble(3));
+					orderTotal += itemRS.getDouble(3); //Add the price to the item number
+				}
+				System.out.println("\tTOTAL: $" + Math.round(orderTotal*100.0)/100.0); //Math.round used to ensure the correct number of decimal digits
 				
 			}
 			//Means no orders were places by the user
@@ -256,7 +264,6 @@ public class Users {
 				displaySearchInterface();
 				String choice = in.nextLine().trim();
 				int userChoice; //The user's selection
-
 				try 
 				{
 					userChoice = Integer.parseInt(choice);
@@ -266,7 +273,6 @@ public class Users {
 					System.out.println("Invalid option! Please select a valid option!");
 					continue;
 				}
-
 				switch (userChoice)
 				{
 					case 1: searchByCategory(); //If the user wants to pick a certain category
@@ -331,7 +337,7 @@ public class Users {
 					case 4: category = "Sports"; 
 							continueSearch = true;
 							break;
-					case 5:	System.out.println("Back to search options...");	// need to implement
+					case 5:	System.out.println("Back to search options...");	
 							runningSearch = false;
 							break;
 					default:System.out.println("Not a valid option");
@@ -359,11 +365,14 @@ public class Users {
 	 */
 	public void searchAllItems()
 	{
-		try {
-			ResultSet rs;
-			rs = searchAllItems.executeQuery();
+		try 
+		{
+			//get the response from the database
+			ResultSet rs = searchAllItems.executeQuery();
 			selectItem(rs);
-		} catch (Exception e) {
+		} 
+		catch (Exception e) 
+		{
 			System.out.println("Error searching all items " + e);
 		}
 	}
@@ -452,17 +461,16 @@ public class Users {
 	*/
 	public void viewCart()
 	{
-                double cartTotal = 0.0; //Keeps track of the total monetary value of the cart
+		double cartTotal = 0.0; //Keeps track of the total monetary value of the cart
 		
 		//Loops through the cart to display the items and to add up the current price
 		for (int i = 0; i < cart.size(); i++)
 		{
 			Item currentItem = cart.get(i);
 			System.out.println("Name: " + currentItem.Name + ", Price: $" + currentItem.Price);
-                        cartTotal += currentItem.Price;
+			cartTotal += currentItem.Price;
 		}
-		
-                System.out.println("TOTAL: $" + Math.round(cartTotal*100.0)/100.0);
+		System.out.println("TOTAL: $" + Math.round(cartTotal*100.0)/100.0);
 	}
 	
 	/**
@@ -475,12 +483,15 @@ public class Users {
 			//If the cart is empty, don't create an order
 			if (cart.isEmpty())
 				System.out.println("Cart is Empty");
-			else{
+			else
+			{
 				String items = ""; //A Comma-seperated value of the item id numbers in the cart
 				
 				//Loop through each item in the cart to decrement the stock of that item in the system
-				for (int i = 0; i < cart.size(); i++){
-					if (cart.get(i).Stock > 0){
+				for (int i = 0; i < cart.size(); i++)
+				{
+					if (cart.get(i).Stock > 0)
+					{
 						items += Integer.toString(cart.get(i).iID); //Converts the item ID into a string
 						
 						//Uses the item ID to decrement the stock of that item in the system
@@ -526,9 +537,7 @@ public class Users {
 					validItem = true;
 				}
 				else
-				{
-//					viewCart();
-					
+				{					
 					System.out.println("Please press 'q' to exit: ");
 					System.out.println("Please select a number to remove:");
 					
@@ -540,8 +549,18 @@ public class Users {
 					}
 					
 					String removeNumb = in.nextLine(); //The number of the item that will be removed
+					
+					//checks if the user is quitting
+					if(removeNumb.equals("q"))
+					{
+						validItem = true;
+						System.out.println("Exiting...");
+						break;
+					}
+					
 					int removeNumber;
-					try {
+					try 
+					{
 						removeNumber = Integer.parseInt(removeNumb);						
 					}
 					catch (Exception e)

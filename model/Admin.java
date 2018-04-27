@@ -17,7 +17,7 @@ public class Admin
 	PreparedStatement deleteUser; //delete a user
 	PreparedStatement displayUsers; //display all the users
 	Statement statement; //sends the queries to the database
-	
+
 	/*
 	 * Initializes the Admin Object
 	 */
@@ -29,16 +29,16 @@ public class Admin
 			in = new Scanner(System.in);
 			connection = c;
 			statement = s;
-			
+
 			//initialize all the prepared statements with the queries
 			addItemPreparedStatement = (PreparedStatement) connection.prepareStatement("INSERT into Items(Name, Price, Description, Category, Stock) values (?, ?, ?, ?, ?);");
-			deleteItemPreparedStatement = (PreparedStatement) connection.prepareStatement("Delete from Items where iID in (select uID from users where iID = ?);");
+			deleteItemPreparedStatement = (PreparedStatement) connection.prepareStatement("Delete from Items where iID = ?;");
 			updateItemPreparedStatement = (PreparedStatement) connection.prepareStatement("Update PriceLowToHigh set Name = ?, Price = ?, Description = ?, Category = ?, Stock = ? where iID = ?;");
 			numberOfUsersPreparedStatement = (PreparedStatement) connection.prepareStatement("select Count(*) from users where admin = 0;");
 			displayItemsInOrderStatement = (PreparedStatement) connection.prepareStatement("select * from PriceLowToHigh");
-			displayUsers = (PreparedStatement) connection.prepareStatement("Select uID, Name, Email from Users where admin <> 1;");
+			displayUsers = (PreparedStatement) connection.prepareStatement("Select uID, Name, Email from Users where uID in (Select uID from users where admin<> 1);");
 			deleteUser = (PreparedStatement) connection.prepareStatement("Delete from users where uID = ?;");
-		   }
+		}
 		catch (Exception e)
 		{
 			System.out.println("There was an error creating the Admin: " + e);
@@ -52,7 +52,7 @@ public class Admin
 	{
 		//determines whether the admin is logged in
 		boolean adminLogged = true;
-		
+
 		//continues to display the options while the admin is logged in
 		while(adminLogged)
 		{
@@ -60,44 +60,44 @@ public class Admin
 			{
 				//displays the options for the admin to choose from
 				displayAdminInterface();
-				
+
 				//gets the input from the admin
 				String choice = in.nextLine().trim();
-				
+
 				//the admin's choice
 				int adminChoice;
 
 				//parsing user input 
 				try 
 				{
-			        adminChoice = Integer.parseInt(choice);
-			    } 
+					adminChoice = Integer.parseInt(choice);
+				} 
 				catch (NumberFormatException e) 
 				{
-			        System.out.println("Invalid option! Please select a valid option!");
-			        continue;
-			    }
-			            	
-			   	//process the options, dispatch functions based on selected option
-			   	switch (adminChoice)
-			   	{
-			   		case 1: addItem(); //go to the add item function
-			   				break;
-			   		case 2: deleteItem(); //go to the delete item function
-			   				break;
-			   		case 3: updateItem(); //go to the update item function
-			   				break;
-			   		case 4: numberOfUsers(); //go to the get number of users function
-			   				break;
-			   		case 5: deleteUser(); //go to the delete user function
-			   				break;
-			   		case 6: System.out.println("Logging Out..."); //user logs out
-			   				adminLogged = false;
-			   				break;
-			   		default: System.out.println("Not a valid option"); //user gave an invalid option
-			   				break;
-			   	}
-			   
+					System.out.println("Invalid option! Please select a valid option!");
+					continue;
+				}
+
+				//process the options, dispatch functions based on selected option
+				switch (adminChoice)
+				{
+				case 1: addItem(); //go to the add item function
+				break;
+				case 2: deleteItem(); //go to the delete item function
+				break;
+				case 3: updateItem(); //go to the update item function
+				break;
+				case 4: numberOfUsers(); //go to the get number of users function
+				break;
+				case 5: deleteUser(); //go to the delete user function
+				break;
+				case 6: System.out.println("Logging Out..."); //user logs out
+				adminLogged = false;
+				break;
+				default: System.out.println("Not a valid option"); //user gave an invalid option
+				break;
+				}
+
 			}
 			catch(Exception e)
 			{
@@ -105,24 +105,24 @@ public class Admin
 			}
 		}
 	}
-	
+
 	/*
 	 * display the admin's user interface
 	 */
 	public void displayAdminInterface()
 	{
-	  System.out.println("Please select an option from the menu:");
-	  System.out.println("=======================");
-	  System.out.println("|1. Add Item			");
-	  System.out.println("|2. Delete Item		");
-	  System.out.println("|3. Update Item		");
-	  System.out.println("|4. Total # of Users  ");
-	  System.out.println("|5. Remove a User		");
-	  System.out.println("|6. Logout			");
-	  System.out.println("=======================");
+		System.out.println("Please select an option from the menu:");
+		System.out.println("=======================");
+		System.out.println("1. Add Item			");
+		System.out.println("2. Delete Item		");
+		System.out.println("3. Update Item		");
+		System.out.println("4. Total # of Users  ");
+		System.out.println("5. Remove a User		");
+		System.out.println("6. Logout			");
+		System.out.println("=======================");
 	}
-	
-	
+
+
 	/*
 	 * Display the categories for the shopping
 	 */
@@ -140,11 +140,11 @@ public class Admin
 				{
 					System.out.println((i+1) + ". " + categories[i]);
 				}
-				
+
 				//user can choose one of the options
 				Scanner in = new Scanner(System.in);
 				int choice = in.nextInt();
-				
+
 				//return the option the use chose
 				return categories[choice - 1];
 			}
@@ -154,9 +154,9 @@ public class Admin
 				continue;
 			}
 		}
-		
+
 	}
-	
+
 	/*
 	 * Gets the number of Users in the Users table
 	 */
@@ -177,7 +177,7 @@ public class Admin
 			System.out.println("There was an error is getting the number of users");
 		}
 	}
-	
+
 	/*
 	 * Add an item into the items table
 	 */
@@ -191,8 +191,8 @@ public class Admin
 			String category = "";
 			int stock = 0;
 			Scanner in = new Scanner(System.in);
-			
-			//asking for info regarding the item to be added
+
+			//asking for info regarding the item to be added. Check to make sure the input is valid
 			while(name.trim().equals(""))
 			{
 				System.out.print("Please enter the name of the item: ");
@@ -212,21 +212,21 @@ public class Admin
 					System.out.println("Please enter a valid price");
 				}
 			}
-			
+
 			in.nextLine();
-			
-			
+
+
 			while(description.trim().equals(""))
 			{
 				System.out.print("Please enter the description of the item: ");
 				description = in.nextLine();
-				
+
 				if (description.trim().equals(""))
 				{
 					System.out.println("Please enter a valid description");
 				}
 			}
-			
+
 			while (category.trim().equals(""))
 			{
 				category = getCategory();
@@ -235,7 +235,7 @@ public class Admin
 					System.out.println("Please enter a valid category");
 				}
 			}
-				
+
 			while (stock <= 0)
 			{
 				System.out.print("Please enter the quantity of the item: ");
@@ -245,10 +245,10 @@ public class Admin
 					System.out.println("Please enter a valid number for the stock");
 				}
 			}
-			
+
 			//helper method for adding the item
 			adminAddItem(name, price, description, category, stock);
-			
+
 			System.out.println("Added Item!");
 		}
 		catch(Exception e)
@@ -256,31 +256,32 @@ public class Admin
 			System.out.println("Error in adding an item");
 		}
 	}
-	
+
 	/*
 	 * Add item helper method
 	 */
 	public void adminAddItem(String name, double price, String description, String category, int stock)
 	{
-	    try 
-	    {
-	    	//set up the info of the item 
-	    	addItemPreparedStatement.setString(1, name);
-	    	addItemPreparedStatement.setDouble(2, price);
-	    	addItemPreparedStatement.setString(3, description);
-	    	addItemPreparedStatement.setString(4, category);
-	    	addItemPreparedStatement.setInt(5, stock);
-	    	//execute the sql statement to update the database
-	    	if (addItemPreparedStatement.execute())
-	    		System.out.println(name + " added to the database!");
-	    }
-	    catch (SQLException e) 
-	    {
-	      e.printStackTrace();
-	    }
-	   
-	  }
-	
+		try 
+		{
+			//set up the info of the item 
+			addItemPreparedStatement.setString(1, name);
+			addItemPreparedStatement.setDouble(2, price);
+			addItemPreparedStatement.setString(3, description);
+			addItemPreparedStatement.setString(4, category);
+			addItemPreparedStatement.setInt(5, stock);
+
+			//execute the sql statement to update the database
+			if (addItemPreparedStatement.execute())
+				System.out.println(name + " added to the database!");
+		}
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+
+	}
+
 	/*
 	 * Delete item from the items table
 	 */
@@ -294,16 +295,16 @@ public class Admin
 			while(rs.next())
 			{
 				//Display all the items
-				System.out.println("ID #: " + rs.getInt(1) + ", Name: " + rs.getString(2));
+				System.out.println("ID #: " + rs.getInt(1) + ", Name: " + rs.getString(2) + ", Price: $" + rs.getDouble(3));
 			}
-			
+
 			//create a new scanner for input
-			
+
 			//get the id number of the item you want to delete
 			System.out.println("Please enter the ID of the item to be deleted: ");
-			
+
 			String idSrt = in.nextLine();
-			
+
 			try
 			{
 				id = Integer.parseInt(idSrt);
@@ -312,7 +313,7 @@ public class Admin
 			{
 				System.out.println("Please enter a valid input!");
 			}
-		
+
 
 		}
 		catch(Exception e)
@@ -321,9 +322,8 @@ public class Admin
 		}
 		//go to helper method to delete the item
 		adminDeleteItem(id);
-		
 	}
-	
+
 	/*
 	 * Delete item helper method
 	 */
@@ -331,9 +331,9 @@ public class Admin
 	{
 		try
 		{
-	    	//add the item info into the query 
+			//add the item info into the query 
 			deleteItemPreparedStatement.setInt(1, id);
-			
+
 			//execute the sql statement to update the database
 			deleteItemPreparedStatement.executeUpdate();
 		}
@@ -344,7 +344,7 @@ public class Admin
 
 	}
 
-		
+
 	/*
 	 * update item in the items table
 	 */
@@ -358,7 +358,7 @@ public class Admin
 			String description = "";
 			String category = "";
 			int stock = 0;
-			
+
 			//get the response from the query
 			ResultSet rs = displayItemsInOrderStatement.executeQuery();
 			while(rs.next())
@@ -366,10 +366,10 @@ public class Admin
 				//display all the items with their IDs
 				System.out.println("ID #: " + rs.getInt(1) + ", Name: " + rs.getString(2));
 			}
-			
+
 			//asking for info regarding the item to be deleted
 			Scanner ini = new Scanner(System.in);
-			
+
 			while (id <= 0)
 			{
 				System.out.print("Please enter the ID of the item to be updated: ");
@@ -377,7 +377,7 @@ public class Admin
 				if (id <= 0)
 					System.out.println("Enter a valid ID");
 			}
-			
+
 			while(name.trim().equals(""))
 			{
 				System.out.print("Please enter the new name of the item: ");
@@ -385,8 +385,8 @@ public class Admin
 				if (name.trim().equals(""))
 					System.out.println("Enter a valid name");
 			}
-			
-			
+
+
 			while (price <= 0)
 			{
 				System.out.print("Please enter the new price of the item: \n$");
@@ -394,7 +394,7 @@ public class Admin
 				if (price <= 0)
 					System.out.println("Enter a valid price");
 			}
-			
+
 			while (description.trim().equals(""))
 			{
 				System.out.print("Please enter the new description of the item: ");
@@ -402,14 +402,14 @@ public class Admin
 				if (description.trim().equals(""))
 					System.out.println("Enter a valid description");
 			}
-			
+
 			while(category.trim().equals(""))
 			{
 				category = getCategory();
 				if (category.trim().equals(""))
 					System.out.println("Enter a valid category");
 			}
-			
+
 			while (stock <= 0)
 			{
 				System.out.print("Please enter the new quantity for the item: ");
@@ -417,11 +417,10 @@ public class Admin
 				if (stock <= 0)
 					System.out.println("Enter a valid quantity number");
 			}
-			
+
 			//go into the helper method for adding the item
 			adminUpdateItem(name, price, description, category, stock, id);
-			
-			System.out.println("Updated Item!");
+
 		}
 		catch (Exception e)
 		{
@@ -443,34 +442,34 @@ public class Admin
 				//display each user along with their ID
 				System.out.println("User ID#: " + rs.getInt(1) + ", Name: " + rs.getString(2) + ", Email: " + rs.getString(3));
 			}
-			
+
 			//get the input from the user
 			Scanner ini = new Scanner(System.in);
-			
+
 			//asking for info regarding the item to be updated
 			System.out.println("Please enter the ID of the user you want to delete: ");
 			int id = ini.nextInt();
-			
+
 			//insert the information into the query
 			deleteUser.setInt(1, id);
-			
+
 			//execute the query
 			deleteUser.execute();
-			System.out.println("User has been deleted\n");
 			
+
 		}
 		catch(Exception e)
 		{
 			System.out.println("There was an error with deleting the user: " + e);
 		}
 	}
-	
+
 	/*
 	 * Update item helper method
 	 */
 	public void adminUpdateItem(String name, double price, String description, String category, int stock, int id)
 	{
-    	
+
 		try
 		{
 			//insert the information into the query
@@ -480,7 +479,7 @@ public class Admin
 			updateItemPreparedStatement.setString(4, category);
 			updateItemPreparedStatement.setInt(5, stock);
 			updateItemPreparedStatement.setInt(6, id);
-			
+
 			//execute the query
 			updateItemPreparedStatement.executeUpdate();
 		}
@@ -490,5 +489,5 @@ public class Admin
 		}
 
 	}
-	
+
 }
